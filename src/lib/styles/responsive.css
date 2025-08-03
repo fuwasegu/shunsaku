@@ -1,0 +1,408 @@
+/* ==========================================================================
+   レスポンシブデザインシステム - Material Design 3ベース
+   ========================================================================== */
+
+/* ==========================================================================
+   ブレークポイント定義
+   ========================================================================== */
+
+:root {
+  /* Material Design 3準拠のブレークポイント */
+  --breakpoint-compact: 0px;        /* 0-599px - Phone */
+  --breakpoint-medium: 600px;       /* 600-839px - Tablet */
+  --breakpoint-expanded: 840px;     /* 840-1199px - Tablet/Desktop */
+  --breakpoint-large: 1200px;       /* 1200-1599px - Desktop */
+  --breakpoint-extra-large: 1600px; /* 1600px+ - Large Desktop */
+}
+
+/* ==========================================================================
+   レスポンシブコンテナシステム
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+  
+  /* Compact: 0-599px */
+  @media (min-width: 0px) {
+    max-width: 100%;
+    padding: 0 var(--spacing-4);
+  }
+  
+  /* Medium: 600-839px */
+  @media (min-width: 600px) {
+    max-width: 840px;
+    padding: 0 var(--spacing-6);
+  }
+  
+  /* Expanded: 840-1199px */
+  @media (min-width: 840px) {
+    max-width: 1200px;
+    padding: 0 var(--spacing-8);
+  }
+  
+  /* Large: 1200-1599px */
+  @media (min-width: 1200px) {
+    max-width: 1600px;
+    padding: 0 var(--spacing-12);
+  }
+  
+  /* Extra Large: 1600px+ */
+  @media (min-width: 1600px) {
+    max-width: 1920px;
+    padding: 0 var(--spacing-16);
+  }
+}
+
+/* ==========================================================================
+   レスポンシブグリッドシステム
+   ========================================================================== */
+
+.grid-responsive {
+  display: grid;
+  gap: var(--spacing-4);
+  
+  /* Compact: 1列 */
+  grid-template-columns: 1fr;
+  
+  /* Medium: 2列 */
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-6);
+  }
+  
+  /* Expanded: 3列 */
+  @media (min-width: 840px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-8);
+  }
+  
+  /* Large: 4列 */
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.grid-responsive-2 {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: 1fr;
+  
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-6);
+  }
+}
+
+.grid-responsive-3 {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: 1fr;
+  
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-6);
+  }
+  
+  @media (min-width: 840px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-8);
+  }
+}
+
+/* ==========================================================================
+   レスポンシブタイポグラフィ
+   ========================================================================== */
+
+.responsive-display-large {
+  /* Compact */
+  font-size: var(--font-display-small-size);
+  line-height: var(--font-display-small-line-height);
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    font-size: var(--font-display-medium-size);
+    line-height: var(--font-display-medium-line-height);
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    font-size: var(--font-display-large-size);
+    line-height: var(--font-display-large-line-height);
+  }
+}
+
+.responsive-headline {
+  /* Compact */
+  font-size: var(--font-headline-small-size);
+  line-height: var(--font-headline-small-line-height);
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    font-size: var(--font-headline-medium-size);
+    line-height: var(--font-headline-medium-line-height);
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    font-size: var(--font-headline-large-size);
+    line-height: var(--font-headline-large-line-height);
+  }
+}
+
+/* ==========================================================================
+   レスポンシブスペーシング
+   ========================================================================== */
+
+.responsive-padding {
+  /* Compact */
+  padding: var(--spacing-4);
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    padding: var(--spacing-6);
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    padding: var(--spacing-8);
+  }
+  
+  /* Large+ */
+  @media (min-width: 1200px) {
+    padding: var(--spacing-12);
+  }
+}
+
+.responsive-margin {
+  /* Compact */
+  margin: var(--spacing-4) 0;
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    margin: var(--spacing-6) 0;
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    margin: var(--spacing-8) 0;
+  }
+  
+  /* Large+ */
+  @media (min-width: 1200px) {
+    margin: var(--spacing-12) 0;
+  }
+}
+
+.responsive-gap {
+  /* Compact */
+  gap: var(--spacing-4);
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    gap: var(--spacing-6);
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    gap: var(--spacing-8);
+  }
+}
+
+/* ==========================================================================
+   レスポンシブナビゲーション
+   ========================================================================== */
+
+.nav-responsive {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-4);
+  background-color: var(--color-surface-container);
+  border-bottom: 1px solid var(--color-outline-variant);
+  
+  /* Mobile-first: スタックレイアウト */
+  flex-direction: column;
+  gap: var(--spacing-4);
+  
+  /* Medium+: 横並びレイアウト */
+  @media (min-width: 600px) {
+    flex-direction: row;
+    padding: var(--spacing-4) var(--spacing-6);
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    padding: var(--spacing-4) var(--spacing-8);
+  }
+  
+  .nav__brand {
+    font-size: var(--font-title-large-size);
+    
+    @media (min-width: 600px) {
+      font-size: var(--font-headline-small-size);
+    }
+  }
+  
+  .nav__menu {
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+    justify-content: center;
+    
+    @media (min-width: 600px) {
+      margin-left: auto;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+  }
+}
+
+/* ==========================================================================
+   レスポンシブカード
+   ========================================================================== */
+
+.card-responsive {
+  @extend .card;
+  
+  /* Compact */
+  padding: var(--spacing-4);
+  border-radius: var(--radius-sm);
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    padding: var(--spacing-6);
+    border-radius: var(--radius-md);
+  }
+  
+  /* Expanded+ */
+  @media (min-width: 840px) {
+    padding: var(--spacing-8);
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ==========================================================================
+   レスポンシブボタン
+   ========================================================================== */
+
+.btn-responsive {
+  @extend .btn;
+  
+  /* Compact: より小さなボタン */
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-label-medium-size);
+  
+  /* Medium+ */
+  @media (min-width: 600px) {
+    padding: var(--spacing-3) var(--spacing-6);
+    font-size: var(--font-label-large-size);
+  }
+}
+
+/* ==========================================================================
+   レスポンシブユーティリティ
+   ========================================================================== */
+
+/* 表示/非表示ユーティリティ */
+.hide-compact {
+  @media (max-width: 599px) {
+    display: none !important;
+  }
+}
+
+.show-compact {
+  @media (min-width: 600px) {
+    display: none !important;
+  }
+}
+
+.hide-medium {
+  @media (min-width: 600px) and (max-width: 839px) {
+    display: none !important;
+  }
+}
+
+.show-medium {
+  @media (max-width: 599px), (min-width: 840px) {
+    display: none !important;
+  }
+}
+
+.hide-expanded {
+  @media (min-width: 840px) and (max-width: 1199px) {
+    display: none !important;
+  }
+}
+
+.show-expanded {
+  @media (max-width: 839px), (min-width: 1200px) {
+    display: none !important;
+  }
+}
+
+.hide-large {
+  @media (min-width: 1200px) {
+    display: none !important;
+  }
+}
+
+.show-large {
+  @media (max-width: 1199px) {
+    display: none !important;
+  }
+}
+
+/* テキスト整列レスポンシブ */
+.text-center-compact {
+  @media (max-width: 599px) {
+    text-align: center;
+  }
+}
+
+.text-left-medium {
+  @media (min-width: 600px) {
+    text-align: left;
+  }
+}
+
+/* フレックスレスポンシブ */
+.flex-col-compact {
+  @media (max-width: 599px) {
+    flex-direction: column;
+  }
+}
+
+.flex-row-medium {
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+}
+
+/* スペーシングレスポンシブ */
+@media (max-width: 599px) {
+  .p-compact-2 { padding: var(--spacing-2); }
+  .p-compact-4 { padding: var(--spacing-4); }
+  .m-compact-2 { margin: var(--spacing-2); }
+  .m-compact-4 { margin: var(--spacing-4); }
+  .gap-compact-2 { gap: var(--spacing-2); }
+  .gap-compact-4 { gap: var(--spacing-4); }
+}
+
+@media (min-width: 600px) {
+  .p-medium-6 { padding: var(--spacing-6); }
+  .p-medium-8 { padding: var(--spacing-8); }
+  .m-medium-6 { margin: var(--spacing-6); }
+  .m-medium-8 { margin: var(--spacing-8); }
+  .gap-medium-6 { gap: var(--spacing-6); }
+  .gap-medium-8 { gap: var(--spacing-8); }
+}
+
+@media (min-width: 840px) {
+  .p-expanded-8 { padding: var(--spacing-8); }
+  .p-expanded-12 { padding: var(--spacing-12); }
+  .m-expanded-8 { margin: var(--spacing-8); }
+  .m-expanded-12 { margin: var(--spacing-12); }
+  .gap-expanded-8 { gap: var(--spacing-8); }
+  .gap-expanded-12 { gap: var(--spacing-12); }
+}

@@ -1,0 +1,713 @@
+/* ==========================================================================
+   コンポーネントスタイル - Material Design 3ベース
+   ========================================================================== */
+
+/* ==========================================================================
+   タイポグラフィクラス
+   ========================================================================== */
+
+.display-large {
+  font-family: var(--font-family-display);
+  font-size: var(--font-display-large-size);
+  line-height: var(--font-display-large-line-height);
+  font-weight: var(--font-display-large-weight);
+  letter-spacing: var(--font-display-large-tracking);
+}
+
+.display-medium {
+  font-family: var(--font-family-display);
+  font-size: var(--font-display-medium-size);
+  line-height: var(--font-display-medium-line-height);
+  font-weight: var(--font-display-medium-weight);
+  letter-spacing: var(--font-display-medium-tracking);
+}
+
+.display-small {
+  font-family: var(--font-family-display);
+  font-size: var(--font-display-small-size);
+  line-height: var(--font-display-small-line-height);
+  font-weight: var(--font-display-small-weight);
+  letter-spacing: var(--font-display-small-tracking);
+}
+
+.headline-large {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-headline-large-size);
+  line-height: var(--font-headline-large-line-height);
+  font-weight: var(--font-headline-large-weight);
+  letter-spacing: var(--font-headline-large-tracking);
+}
+
+.headline-medium {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-headline-medium-size);
+  line-height: var(--font-headline-medium-line-height);
+  font-weight: var(--font-headline-medium-weight);
+  letter-spacing: var(--font-headline-medium-tracking);
+}
+
+.headline-small {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-headline-small-size);
+  line-height: var(--font-headline-small-line-height);
+  font-weight: var(--font-headline-small-weight);
+  letter-spacing: var(--font-headline-small-tracking);
+}
+
+.title-large {
+  font-family: var(--font-family-title);
+  font-size: var(--font-title-large-size);
+  line-height: var(--font-title-large-line-height);
+  font-weight: var(--font-title-large-weight);
+  letter-spacing: var(--font-title-large-tracking);
+}
+
+.title-medium {
+  font-family: var(--font-family-title);
+  font-size: var(--font-title-medium-size);
+  line-height: var(--font-title-medium-line-height);
+  font-weight: var(--font-title-medium-weight);
+  letter-spacing: var(--font-title-medium-tracking);
+}
+
+.title-small {
+  font-family: var(--font-family-title);
+  font-size: var(--font-title-small-size);
+  line-height: var(--font-title-small-line-height);
+  font-weight: var(--font-title-small-weight);
+  letter-spacing: var(--font-title-small-tracking);
+}
+
+.body-large {
+  font-family: var(--font-family-body);
+  font-size: var(--font-body-large-size);
+  line-height: var(--font-body-large-line-height);
+  font-weight: var(--font-body-large-weight);
+  letter-spacing: var(--font-body-large-tracking);
+}
+
+.body-medium {
+  font-family: var(--font-family-body);
+  font-size: var(--font-body-medium-size);
+  line-height: var(--font-body-medium-line-height);
+  font-weight: var(--font-body-medium-weight);
+  letter-spacing: var(--font-body-medium-tracking);
+}
+
+.body-small {
+  font-family: var(--font-family-body);
+  font-size: var(--font-body-small-size);
+  line-height: var(--font-body-small-line-height);
+  font-weight: var(--font-body-small-weight);
+  letter-spacing: var(--font-body-small-tracking);
+}
+
+.label-large {
+  font-family: var(--font-family-label);
+  font-size: var(--font-label-large-size);
+  line-height: var(--font-label-large-line-height);
+  font-weight: var(--font-label-large-weight);
+  letter-spacing: var(--font-label-large-tracking);
+}
+
+.label-medium {
+  font-family: var(--font-family-label);
+  font-size: var(--font-label-medium-size);
+  line-height: var(--font-label-medium-line-height);
+  font-weight: var(--font-label-medium-weight);
+  letter-spacing: var(--font-label-medium-tracking);
+}
+
+.label-small {
+  font-family: var(--font-family-label);
+  font-size: var(--font-label-small-size);
+  line-height: var(--font-label-small-line-height);
+  font-weight: var(--font-label-small-weight);
+  letter-spacing: var(--font-label-small-tracking);
+}
+
+/* ==========================================================================
+   ボタンコンポーネント
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  user-select: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  
+  &:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--transition-standard);
+  }
+  
+  &:hover::before {
+    opacity: 0.08;
+  }
+  
+  &:focus-visible::before {
+    opacity: 0.12;
+  }
+  
+  &:active::before {
+    opacity: 0.16;
+  }
+}
+
+.btn--filled {
+  @extend .label-large;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--elevation-0);
+  
+  &::before {
+    background-color: var(--color-on-primary);
+  }
+  
+  &:hover {
+    box-shadow: var(--elevation-1);
+  }
+  
+  &:focus-visible {
+    box-shadow: var(--elevation-0);
+  }
+  
+  &:active {
+    box-shadow: var(--elevation-0);
+  }
+}
+
+.btn--outlined {
+  @extend .label-large;
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-outline);
+  
+  &::before {
+    background-color: var(--color-primary);
+  }
+  
+  &:hover {
+    border-color: var(--color-primary);
+  }
+}
+
+.btn--text {
+  @extend .label-large;
+  background-color: transparent;
+  color: var(--color-primary);
+  padding: var(--spacing-3) var(--spacing-4);
+  
+  &::before {
+    background-color: var(--color-primary);
+  }
+}
+
+.btn--tonal {
+  @extend .label-large;
+  background-color: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+  
+  &::before {
+    background-color: var(--color-on-secondary-container);
+  }
+  
+  &:hover {
+    box-shadow: var(--elevation-1);
+  }
+}
+
+.btn--elevated {
+  @extend .label-large;
+  background-color: var(--color-surface-container-low);
+  color: var(--color-primary);
+  box-shadow: var(--elevation-1);
+  
+  &::before {
+    background-color: var(--color-primary);
+  }
+  
+  &:hover {
+    box-shadow: var(--elevation-2);
+  }
+  
+  &:focus-visible {
+    box-shadow: var(--elevation-1);
+  }
+  
+  &:active {
+    box-shadow: var(--elevation-1);
+  }
+}
+
+.btn--icon {
+  padding: var(--spacing-2);
+  border-radius: var(--radius-full);
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.btn--fab {
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+  width: 3.5rem;
+  height: 3.5rem;
+  box-shadow: var(--elevation-3);
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  
+  &::before {
+    background-color: var(--color-on-primary-container);
+  }
+  
+  &:hover {
+    box-shadow: var(--elevation-4);
+  }
+  
+  &:focus-visible {
+    box-shadow: var(--elevation-3);
+  }
+  
+  &:active {
+    box-shadow: var(--elevation-3);
+  }
+}
+
+/* ==========================================================================
+   カードコンポーネント
+   ========================================================================== */
+
+.card {
+  background-color: var(--color-surface-container);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-4);
+  transition: all var(--transition-standard);
+  position: relative;
+  overflow: hidden;
+  
+  &--elevated {
+    background-color: var(--color-surface-container-low);
+    box-shadow: var(--elevation-1);
+    
+    &:hover {
+      box-shadow: var(--elevation-2);
+    }
+  }
+  
+  &--filled {
+    background-color: var(--color-surface-container-highest);
+  }
+  
+  &--outlined {
+    border: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface);
+  }
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.card__content {
+  margin-bottom: var(--spacing-4);
+}
+
+.card__actions {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+}
+
+/* ==========================================================================
+   チップコンポーネント
+   ========================================================================== */
+
+.chip {
+  @extend .label-large;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--transition-standard);
+  }
+  
+  &:hover::before {
+    opacity: 0.08;
+  }
+  
+  &:focus-visible::before {
+    opacity: 0.12;
+  }
+  
+  &:active::before {
+    opacity: 0.16;
+  }
+  
+  &--assist {
+    background-color: transparent;
+    color: var(--color-on-surface);
+    border: 1px solid var(--color-outline);
+    
+    &::before {
+      background-color: var(--color-on-surface);
+    }
+  }
+  
+  &--filter {
+    background-color: transparent;
+    color: var(--color-on-surface-variant);
+    border: 1px solid var(--color-outline);
+    
+    &::before {
+      background-color: var(--color-on-surface-variant);
+    }
+    
+    &.chip--selected {
+      background-color: var(--color-secondary-container);
+      color: var(--color-on-secondary-container);
+      border-color: transparent;
+      
+      &::before {
+        background-color: var(--color-on-secondary-container);
+      }
+    }
+  }
+  
+  &--input {
+    background-color: transparent;
+    color: var(--color-on-surface-variant);
+    border: 1px solid var(--color-outline);
+    
+    &::before {
+      background-color: var(--color-on-surface-variant);
+    }
+    
+    &.chip--selected {
+      background-color: var(--color-secondary-container);
+      color: var(--color-on-secondary-container);
+      border-color: transparent;
+      
+      &::before {
+        background-color: var(--color-on-secondary-container);
+      }
+    }
+  }
+  
+  &--suggestion {
+    background-color: transparent;
+    color: var(--color-on-surface-variant);
+    border: 1px solid var(--color-outline);
+    
+    &::before {
+      background-color: var(--color-on-surface-variant);
+    }
+    
+    &:hover {
+      color: var(--color-on-surface);
+      border-color: var(--color-on-surface);
+      
+      &::before {
+        background-color: var(--color-on-surface);
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   フォームコンポーネント
+   ========================================================================== */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+.form-label {
+  @extend .body-small;
+  color: var(--color-on-surface-variant);
+}
+
+.form-input {
+  @extend .body-large;
+  padding: var(--spacing-4);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-xs);
+  background-color: var(--color-surface-container-highest);
+  color: var(--color-on-surface);
+  transition: all var(--transition-standard);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+  
+  &:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  
+  &::placeholder {
+    color: var(--color-on-surface-variant);
+    opacity: 0.7;
+  }
+}
+
+.form-textarea {
+  @extend .form-input;
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.form-select {
+  @extend .form-input;
+  cursor: pointer;
+  
+  &::-ms-expand {
+    display: none;
+  }
+}
+
+.form-checkbox,
+.form-radio {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-outline);
+  border-radius: var(--radius-xs);
+  background-color: transparent;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  position: relative;
+  
+  &:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--color-on-primary);
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+  }
+  
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.form-radio {
+  border-radius: 50%;
+  
+  &:checked::after {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--color-on-primary);
+  }
+}
+
+/* ==========================================================================
+   ナビゲーションコンポーネント
+   ========================================================================== */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-surface-container);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.nav__brand {
+  @extend .title-large;
+  color: var(--color-on-surface);
+  font-weight: 600;
+}
+
+.nav__menu {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-left: auto;
+}
+
+.nav__item {
+  @extend .label-large;
+  color: var(--color-on-surface-variant);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: var(--color-on-surface);
+    opacity: 0;
+    transition: opacity var(--transition-standard);
+  }
+  
+  &:hover {
+    color: var(--color-on-surface);
+    
+    &::before {
+      opacity: 0.08;
+    }
+  }
+  
+  &--active {
+    color: var(--color-on-secondary-container);
+    background-color: var(--color-secondary-container);
+    
+    &::before {
+      background-color: var(--color-on-secondary-container);
+    }
+  }
+}
+
+/* ==========================================================================
+   ユーティリティクラス
+   ========================================================================== */
+
+/* Surface variants */
+.surface-dim { background-color: var(--color-surface-dim); }
+.surface-bright { background-color: var(--color-surface-bright); }
+.surface-container-lowest { background-color: var(--color-surface-container-lowest); }
+.surface-container-low { background-color: var(--color-surface-container-low); }
+.surface-container { background-color: var(--color-surface-container); }
+.surface-container-high { background-color: var(--color-surface-container-high); }
+.surface-container-highest { background-color: var(--color-surface-container-highest); }
+
+/* Text colors */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-tertiary { color: var(--color-tertiary); }
+.text-error { color: var(--color-error); }
+.text-on-surface { color: var(--color-on-surface); }
+.text-on-surface-variant { color: var(--color-on-surface-variant); }
+
+/* Spacing utilities */
+.p-0 { padding: var(--spacing-0); }
+.p-1 { padding: var(--spacing-1); }
+.p-2 { padding: var(--spacing-2); }
+.p-3 { padding: var(--spacing-3); }
+.p-4 { padding: var(--spacing-4); }
+.p-6 { padding: var(--spacing-6); }
+.p-8 { padding: var(--spacing-8); }
+.p-12 { padding: var(--spacing-12); }
+.p-16 { padding: var(--spacing-16); }
+.p-24 { padding: var(--spacing-24); }
+
+.m-0 { margin: var(--spacing-0); }
+.m-1 { margin: var(--spacing-1); }
+.m-2 { margin: var(--spacing-2); }
+.m-3 { margin: var(--spacing-3); }
+.m-4 { margin: var(--spacing-4); }
+.m-6 { margin: var(--spacing-6); }
+.m-8 { margin: var(--spacing-8); }
+.m-12 { margin: var(--spacing-12); }
+.m-16 { margin: var(--spacing-16); }
+.m-24 { margin: var(--spacing-24); }
+
+/* Gap utilities */
+.gap-0 { gap: var(--spacing-0); }
+.gap-1 { gap: var(--spacing-1); }
+.gap-2 { gap: var(--spacing-2); }
+.gap-3 { gap: var(--spacing-3); }
+.gap-4 { gap: var(--spacing-4); }
+.gap-6 { gap: var(--spacing-6); }
+.gap-8 { gap: var(--spacing-8); }
+.gap-12 { gap: var(--spacing-12); }
+
+/* Border radius utilities */
+.rounded-none { border-radius: var(--radius-none); }
+.rounded-xs { border-radius: var(--radius-xs); }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* Elevation utilities */
+.elevation-0 { box-shadow: var(--elevation-0); }
+.elevation-1 { box-shadow: var(--elevation-1); }
+.elevation-2 { box-shadow: var(--elevation-2); }
+.elevation-3 { box-shadow: var(--elevation-3); }
+.elevation-4 { box-shadow: var(--elevation-4); }
+.elevation-5 { box-shadow: var(--elevation-5); }
+
+/* Layout utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+
+/* Text alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }

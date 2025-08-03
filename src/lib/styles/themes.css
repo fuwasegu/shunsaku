@@ -1,0 +1,423 @@
+/* ==========================================================================
+   テーマシステム - Material Design 3ベース
+   ========================================================================== */
+
+/* ==========================================================================
+   デフォルトテーマ（ライトモード）
+   ========================================================================== */
+
+:root {
+  /* Light theme semantic colors */
+  --color-surface: #fefdf6;
+  --color-surface-container: #f2f2ea;
+  --color-surface-container-low: #fcfbf4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #ecebe4;
+  --color-surface-container-highest: #e6e5de;
+  --color-surface-dim: #dcdbd4;
+  --color-surface-bright: #fefdf6;
+  
+  --color-on-surface: #1a1c18;
+  --color-on-surface-variant: #424944;
+  
+  --color-outline: #737a73;
+  --color-outline-variant: #c3cac1;
+  
+  --color-primary: #006d46;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #97fbaa;
+  --color-on-primary-container: #002114;
+  
+  --color-secondary: #506455;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d2e8d6;
+  --color-on-secondary-container: #0e1f13;
+  
+  --color-tertiary: #5c6200;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #dee85d;
+  --color-on-tertiary-container: #1a1c00;
+  
+  --color-error: #b3261e;
+  --color-on-error: #ffffff;
+  --color-error-container: #f9dedc;
+  --color-on-error-container: #410e0b;
+}
+
+/* ==========================================================================
+   Ocean（オーシャンブルー）テーマ
+   ========================================================================== */
+
+[data-theme="ocean"] {
+  /* Primary - Ocean Blue */
+  --color-primary-10: #001f2a;
+  --color-primary-20: #003547;
+  --color-primary-30: #004d63;
+  --color-primary-40: #006780;
+  --color-primary-50: #00829e;
+  --color-primary-60: #009ebd;
+  --color-primary-70: #4db8d3;
+  --color-primary-80: #74d1e9;
+  --color-primary-90: #b8eaff;
+  --color-primary-95: #ddf4ff;
+  --color-primary-99: #f6feff;
+  
+  /* Light theme colors */
+  --color-surface: #f6feff;
+  --color-surface-container: #ddf4ff;
+  --color-surface-container-low: #ecf8ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #d1eff9;
+  --color-surface-container-highest: #c5e9f3;
+  
+  --color-primary: #006780;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #b8eaff;
+  --color-on-primary-container: #001f2a;
+  
+  --color-secondary: #4a6267;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #cce8ec;
+  --color-on-secondary-container: #051f23;
+  
+  --color-tertiary: #525e7d;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #dae2ff;
+  --color-on-tertiary-container: #0e1b37;
+}
+
+/* ==========================================================================
+   Sunset（サンセットオレンジ）テーマ
+   ========================================================================== */
+
+[data-theme="sunset"] {
+  /* Primary - Sunset Orange */
+  --color-primary-10: #390c00;
+  --color-primary-20: #5a1a00;
+  --color-primary-30: #7d2900;
+  --color-primary-40: #a23900;
+  --color-primary-50: #c94a00;
+  --color-primary-60: #f15c00;
+  --color-primary-70: #ff8947;
+  --color-primary-80: #ffb59c;
+  --color-primary-90: #ffdad0;
+  --color-primary-95: #ffede7;
+  --color-primary-99: #fffbf9;
+  
+  /* Light theme colors */
+  --color-surface: #fffbf9;
+  --color-surface-container: #ffede7;
+  --color-surface-container-low: #fff4ef;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #ffe7db;
+  --color-surface-container-highest: #fde1d5;
+  
+  --color-primary: #a23900;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ffdad0;
+  --color-on-primary-container: #390c00;
+  
+  --color-secondary: #765849;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ffdccb;
+  --color-on-secondary-container: #2b160a;
+  
+  --color-tertiary: #656032;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #eae6aa;
+  --color-on-tertiary-container: #1f1d00;
+}
+
+/* ==========================================================================
+   Purple（パープル）テーマ
+   ========================================================================== */
+
+[data-theme="purple"] {
+  /* Primary - Purple */
+  --color-primary-10: #21005d;
+  --color-primary-20: #371e73;
+  --color-primary-30: #4f378b;
+  --color-primary-40: #6750a4;
+  --color-primary-50: #7f67be;
+  --color-primary-60: #9a82db;
+  --color-primary-70: #b69df8;
+  --color-primary-80: #d0bcff;
+  --color-primary-90: #eaddff;
+  --color-primary-95: #f6edff;
+  --color-primary-99: #fffbfe;
+  
+  /* Light theme colors */
+  --color-surface: #fffbfe;
+  --color-surface-container: #f6edff;
+  --color-surface-container-low: #fcf8ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #f0e7f9;
+  --color-surface-container-highest: #eae1f3;
+  
+  --color-primary: #6750a4;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #eaddff;
+  --color-on-primary-container: #21005d;
+  
+  --color-secondary: #625b71;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e8def8;
+  --color-on-secondary-container: #1d192b;
+  
+  --color-tertiary: #7d5260;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ffd8e4;
+  --color-on-tertiary-container: #31111d;
+}
+
+/* ==========================================================================
+   Forest（フォレストグリーン）テーマ
+   ========================================================================== */
+
+[data-theme="forest"] {
+  /* Primary - Forest Green */
+  --color-primary-10: #002204;
+  --color-primary-20: #00390a;
+  --color-primary-30: #005312;
+  --color-primary-40: #006e1c;
+  --color-primary-50: #008a25;
+  --color-primary-60: #22a731;
+  --color-primary-70: #4ac248;
+  --color-primary-80: #6ede62;
+  --color-primary-90: #93fa7d;
+  --color-primary-95: #c3ffad;
+  --color-primary-99: #f0fff0;
+  
+  /* Light theme colors */
+  --color-surface: #f0fff0;
+  --color-surface-container: #c3ffad;
+  --color-surface-container-low: #e6ffe6;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #b7f3a7;
+  --color-surface-container-highest: #abeda1;
+  
+  --color-primary: #006e1c;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #93fa7d;
+  --color-on-primary-container: #002204;
+  
+  --color-secondary: #52634f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d5e8cf;
+  --color-on-secondary-container: #101f0f;
+  
+  --color-tertiary: #38656a;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #bbebf0;
+  --color-on-tertiary-container: #002023;
+}
+
+/* ==========================================================================
+   Monochrome（モノクローム）テーマ
+   ========================================================================== */
+
+[data-theme="monochrome"] {
+  /* Primary - Monochrome */
+  --color-primary-10: #000000;
+  --color-primary-20: #2e2e2e;
+  --color-primary-30: #424242;
+  --color-primary-40: #616161;
+  --color-primary-50: #757575;
+  --color-primary-60: #9e9e9e;
+  --color-primary-70: #bdbdbd;
+  --color-primary-80: #e0e0e0;
+  --color-primary-90: #f5f5f5;
+  --color-primary-95: #fafafa;
+  --color-primary-99: #ffffff;
+  
+  /* Light theme colors */
+  --color-surface: #ffffff;
+  --color-surface-container: #f5f5f5;
+  --color-surface-container-low: #fafafa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #eeeeee;
+  --color-surface-container-highest: #e8e8e8;
+  
+  --color-primary: #424242;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #f5f5f5;
+  --color-on-primary-container: #000000;
+  
+  --color-secondary: #5f5f5f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e4e4e4;
+  --color-on-secondary-container: #1c1c1c;
+  
+  --color-tertiary: #757575;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ededed;
+  --color-on-tertiary-container: #2e2e2e;
+}
+
+/* ==========================================================================
+   Rose（ローズピンク）テーマ
+   ========================================================================== */
+
+[data-theme="rose"] {
+  /* Primary - Rose Pink */
+  --color-primary-10: #3e001d;
+  --color-primary-20: #5e1133;
+  --color-primary-30: #7f294a;
+  --color-primary-40: #a24162;
+  --color-primary-50: #c6597b;
+  --color-primary-60: #eb7395;
+  --color-primary-70: #ff8ea9;
+  --color-primary-80: #ffb1c8;
+  --color-primary-90: #ffd9e4;
+  --color-primary-95: #ffecf1;
+  --color-primary-99: #fffbf9;
+  
+  /* Light theme colors */
+  --color-surface: #fffbf9;
+  --color-surface-container: #ffecf1;
+  --color-surface-container-low: #fff3f6;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #ffe6eb;
+  --color-surface-container-highest: #fee0e5;
+  
+  --color-primary: #a24162;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ffd9e4;
+  --color-on-primary-container: #3e001d;
+  
+  --color-secondary: #745659;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ffd9dc;
+  --color-on-secondary-container: #2b1517;
+  
+  --color-tertiary: #7c5635;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ffddb3;
+  --color-on-tertiary-container: #2e1500;
+}
+
+/* ==========================================================================
+   ダークテーマ（全テーマ共通）
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  [data-theme="ocean"],
+  [data-theme="sunset"],
+  [data-theme="purple"],
+  [data-theme="forest"],
+  [data-theme="monochrome"],
+  [data-theme="rose"] {
+    /* Dark theme semantic colors */
+    --color-surface: var(--color-neutral-10);
+    --color-surface-container: var(--color-neutral-20);
+    --color-surface-container-low: var(--color-neutral-15);
+    --color-surface-container-lowest: var(--color-neutral-4);
+    --color-surface-container-high: var(--color-neutral-24);
+    --color-surface-container-highest: var(--color-neutral-30);
+    --color-surface-dim: var(--color-neutral-6);
+    --color-surface-bright: var(--color-neutral-24);
+    
+    --color-on-surface: var(--color-neutral-90);
+    --color-on-surface-variant: var(--color-neutral-variant-80);
+    
+    --color-outline: var(--color-neutral-variant-60);
+    --color-outline-variant: var(--color-neutral-variant-30);
+    
+    --color-primary: var(--color-primary-80);
+    --color-on-primary: var(--color-primary-20);
+    --color-primary-container: var(--color-primary-30);
+    --color-on-primary-container: var(--color-primary-90);
+    
+    --color-secondary: var(--color-secondary-80);
+    --color-on-secondary: var(--color-secondary-20);
+    --color-secondary-container: var(--color-secondary-30);
+    --color-on-secondary-container: var(--color-secondary-90);
+    
+    --color-tertiary: var(--color-tertiary-80);
+    --color-on-tertiary: var(--color-tertiary-20);
+    --color-tertiary-container: var(--color-tertiary-30);
+    --color-on-tertiary-container: var(--color-tertiary-90);
+    
+    --color-error: var(--color-error-80);
+    --color-on-error: var(--color-error-20);
+    --color-error-container: var(--color-error-30);
+    --color-on-error-container: var(--color-error-90);
+  }
+}
+
+/* ==========================================================================
+   強制ライトモード（ユーザー設定で明示的にライトテーマを選択した場合）
+   ========================================================================== */
+
+[data-theme-mode="light"] {
+  /* 各テーマのライトモード設定を強制適用 */
+  --color-surface: var(--color-primary-99);
+  --color-surface-container: var(--color-primary-95);
+  --color-surface-container-low: var(--color-primary-98);
+  --color-surface-container-lowest: var(--color-primary-100);
+  --color-surface-container-high: var(--color-primary-92);
+  --color-surface-container-highest: var(--color-primary-90);
+  
+  --color-on-surface: var(--color-neutral-10);
+  --color-on-surface-variant: var(--color-neutral-variant-30);
+  
+  --color-outline: var(--color-neutral-variant-50);
+  --color-outline-variant: var(--color-neutral-variant-80);
+  
+  --color-primary: var(--color-primary-40);
+  --color-on-primary: var(--color-primary-100);
+  --color-primary-container: var(--color-primary-90);
+  --color-on-primary-container: var(--color-primary-10);
+  
+  --color-secondary: var(--color-secondary-40);
+  --color-on-secondary: var(--color-secondary-100);
+  --color-secondary-container: var(--color-secondary-90);
+  --color-on-secondary-container: var(--color-secondary-10);
+  
+  --color-tertiary: var(--color-tertiary-40);
+  --color-on-tertiary: var(--color-tertiary-100);
+  --color-tertiary-container: var(--color-tertiary-90);
+  --color-on-tertiary-container: var(--color-tertiary-10);
+}
+
+/* ==========================================================================
+   強制ダークモード（ユーザー設定で明示的にダークテーマを選択した場合）
+   ========================================================================== */
+
+[data-theme-mode="dark"] {
+  --color-surface: var(--color-neutral-10);
+  --color-surface-container: var(--color-neutral-20);
+  --color-surface-container-low: var(--color-neutral-15);
+  --color-surface-container-lowest: var(--color-neutral-4);
+  --color-surface-container-high: var(--color-neutral-24);
+  --color-surface-container-highest: var(--color-neutral-30);
+  --color-surface-dim: var(--color-neutral-6);
+  --color-surface-bright: var(--color-neutral-24);
+  
+  --color-on-surface: var(--color-neutral-90);
+  --color-on-surface-variant: var(--color-neutral-variant-80);
+  
+  --color-outline: var(--color-neutral-variant-60);
+  --color-outline-variant: var(--color-neutral-variant-30);
+  
+  --color-primary: var(--color-primary-80);
+  --color-on-primary: var(--color-primary-20);
+  --color-primary-container: var(--color-primary-30);
+  --color-on-primary-container: var(--color-primary-90);
+  
+  --color-secondary: var(--color-secondary-80);
+  --color-on-secondary: var(--color-secondary-20);
+  --color-secondary-container: var(--color-secondary-30);
+  --color-on-secondary-container: var(--color-secondary-90);
+  
+  --color-tertiary: var(--color-tertiary-80);
+  --color-on-tertiary: var(--color-tertiary-20);
+  --color-tertiary-container: var(--color-tertiary-30);
+  --color-on-tertiary-container: var(--color-tertiary-90);
+  
+  --color-error: var(--color-error-80);
+  --color-on-error: var(--color-error-20);
+  --color-error-container: var(--color-error-30);
+  --color-on-error-container: var(--color-error-90);
+}

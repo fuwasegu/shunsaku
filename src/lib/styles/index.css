@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Material Design 3 ベースのデザインシステム
+   ========================================================================== */
+
+/* Google Fonts - Noto Sans JP */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* デザイントークンの読み込み */
+@import './design-tokens.css';
+
+/* テーマシステムの読み込み */
+@import './themes.css';
+
+/* ベーススタイルの読み込み */
+@import './base.css';
+
+/* コンポーネントスタイルの読み込み */
+@import './components.css';
+
+/* レスポンシブシステムの読み込み */
+@import './responsive.css';

@@ -1,0 +1,330 @@
+/* ==========================================================================
+   デザイントークン - Material Design 3ベース
+   ========================================================================== */
+
+:root {
+  /* ==========================================================================
+     カラーシステム - Material Design 3
+     ========================================================================== */
+  
+  /* Primary Colors */
+  --color-primary-10: #002114;
+  --color-primary-20: #003823;
+  --color-primary-30: #005234;
+  --color-primary-40: #006d46;
+  --color-primary-50: #008a59;
+  --color-primary-60: #26a96a;
+  --color-primary-70: #4fc47e;
+  --color-primary-80: #72df94;
+  --color-primary-90: #97fbaa;
+  --color-primary-95: #c7ffc7;
+  --color-primary-99: #f6fff0;
+  --color-primary-100: #ffffff;
+
+  /* Secondary Colors */
+  --color-secondary-10: #0e1f13;
+  --color-secondary-20: #233528;
+  --color-secondary-30: #394c3e;
+  --color-secondary-40: #506455;
+  --color-secondary-50: #687d6c;
+  --color-secondary-60: #819685;
+  --color-secondary-70: #9bb19f;
+  --color-secondary-80: #b6ccba;
+  --color-secondary-90: #d2e8d6;
+  --color-secondary-95: #e0f6e4;
+  --color-secondary-99: #f6fff0;
+  --color-secondary-100: #ffffff;
+
+  /* Tertiary Colors */
+  --color-tertiary-10: #1a1c00;
+  --color-tertiary-20: #2f3300;
+  --color-tertiary-30: #454a00;
+  --color-tertiary-40: #5c6200;
+  --color-tertiary-50: #747b00;
+  --color-tertiary-60: #8d9500;
+  --color-tertiary-70: #a7b023;
+  --color-tertiary-80: #c2cc41;
+  --color-tertiary-90: #dee85d;
+  --color-tertiary-95: #ecf66b;
+  --color-tertiary-99: #fefff2;
+  --color-tertiary-100: #ffffff;
+
+  /* Error Colors */
+  --color-error-10: #410e0b;
+  --color-error-20: #601410;
+  --color-error-30: #8c1d18;
+  --color-error-40: #b3261e;
+  --color-error-50: #dc362e;
+  --color-error-60: #e46962;
+  --color-error-70: #ec928e;
+  --color-error-80: #f2b8b5;
+  --color-error-90: #f9dedc;
+  --color-error-95: #fceeee;
+  --color-error-99: #fffbf9;
+  --color-error-100: #ffffff;
+
+  /* Neutral Colors */
+  --color-neutral-0: #000000;
+  --color-neutral-10: #1a1c18;
+  --color-neutral-20: #2f312d;
+  --color-neutral-30: #464843;
+  --color-neutral-40: #5e615a;
+  --color-neutral-50: #777972;
+  --color-neutral-60: #91938b;
+  --color-neutral-70: #acada5;
+  --color-neutral-80: #c8c8c0;
+  --color-neutral-90: #e4e4dc;
+  --color-neutral-95: #f2f2ea;
+  --color-neutral-99: #fefdf6;
+  --color-neutral-100: #ffffff;
+
+  /* Neutral Variant Colors */
+  --color-neutral-variant-10: #171d19;
+  --color-neutral-variant-20: #2c322e;
+  --color-neutral-variant-30: #424944;
+  --color-neutral-variant-40: #5a615b;
+  --color-neutral-variant-50: #737a73;
+  --color-neutral-variant-60: #8d948c;
+  --color-neutral-variant-70: #a8aea6;
+  --color-neutral-variant-80: #c3cac1;
+  --color-neutral-variant-90: #dfe6dd;
+  --color-neutral-variant-95: #edf4eb;
+  --color-neutral-variant-99: #fafdf8;
+  --color-neutral-variant-100: #ffffff;
+
+  /* ==========================================================================
+     セマンティックカラー
+     ========================================================================== */
+  
+  /* Light theme semantic colors */
+  --color-surface: var(--color-neutral-99);
+  --color-surface-container: var(--color-neutral-95);
+  --color-surface-container-low: var(--color-neutral-96);
+  --color-surface-container-lowest: var(--color-neutral-100);
+  --color-surface-container-high: var(--color-neutral-92);
+  --color-surface-container-highest: var(--color-neutral-90);
+  --color-surface-dim: var(--color-neutral-87);
+  --color-surface-bright: var(--color-neutral-98);
+  
+  --color-on-surface: var(--color-neutral-10);
+  --color-on-surface-variant: var(--color-neutral-variant-30);
+  
+  --color-outline: var(--color-neutral-variant-50);
+  --color-outline-variant: var(--color-neutral-variant-80);
+  
+  --color-primary: var(--color-primary-40);
+  --color-on-primary: var(--color-primary-100);
+  --color-primary-container: var(--color-primary-90);
+  --color-on-primary-container: var(--color-primary-10);
+  
+  --color-secondary: var(--color-secondary-40);
+  --color-on-secondary: var(--color-secondary-100);
+  --color-secondary-container: var(--color-secondary-90);
+  --color-on-secondary-container: var(--color-secondary-10);
+  
+  --color-tertiary: var(--color-tertiary-40);
+  --color-on-tertiary: var(--color-tertiary-100);
+  --color-tertiary-container: var(--color-tertiary-90);
+  --color-on-tertiary-container: var(--color-tertiary-10);
+  
+  --color-error: var(--color-error-40);
+  --color-on-error: var(--color-error-100);
+  --color-error-container: var(--color-error-90);
+  --color-on-error-container: var(--color-error-10);
+
+  /* ==========================================================================
+     タイポグラフィ - Material Design 3 Type Scale
+     ========================================================================== */
+  
+  /* Font Families */
+  --font-family-display: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-body: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-label: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-title: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-headline: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Display */
+  --font-display-large-size: 3.5rem;      /* 56px */
+  --font-display-large-line-height: 4rem; /* 64px */
+  --font-display-large-weight: 400;
+  --font-display-large-tracking: -0.025em;
+  
+  --font-display-medium-size: 2.8125rem;    /* 45px */
+  --font-display-medium-line-height: 3.25rem; /* 52px */
+  --font-display-medium-weight: 400;
+  --font-display-medium-tracking: 0;
+  
+  --font-display-small-size: 2.25rem;     /* 36px */
+  --font-display-small-line-height: 2.75rem; /* 44px */
+  --font-display-small-weight: 400;
+  --font-display-small-tracking: 0;
+  
+  /* Headline */
+  --font-headline-large-size: 2rem;       /* 32px */
+  --font-headline-large-line-height: 2.5rem; /* 40px */
+  --font-headline-large-weight: 400;
+  --font-headline-large-tracking: 0;
+  
+  --font-headline-medium-size: 1.75rem;   /* 28px */
+  --font-headline-medium-line-height: 2.25rem; /* 36px */
+  --font-headline-medium-weight: 400;
+  --font-headline-medium-tracking: 0;
+  
+  --font-headline-small-size: 1.5rem;     /* 24px */
+  --font-headline-small-line-height: 2rem; /* 32px */
+  --font-headline-small-weight: 400;
+  --font-headline-small-tracking: 0;
+  
+  /* Title */
+  --font-title-large-size: 1.375rem;      /* 22px */
+  --font-title-large-line-height: 1.75rem; /* 28px */
+  --font-title-large-weight: 400;
+  --font-title-large-tracking: 0;
+  
+  --font-title-medium-size: 1rem;         /* 16px */
+  --font-title-medium-line-height: 1.5rem; /* 24px */
+  --font-title-medium-weight: 500;
+  --font-title-medium-tracking: 0.015em;
+  
+  --font-title-small-size: 0.875rem;      /* 14px */
+  --font-title-small-line-height: 1.25rem; /* 20px */
+  --font-title-small-weight: 500;
+  --font-title-small-tracking: 0.01em;
+  
+  /* Body */
+  --font-body-large-size: 1rem;           /* 16px */
+  --font-body-large-line-height: 1.5rem;  /* 24px */
+  --font-body-large-weight: 400;
+  --font-body-large-tracking: 0.015em;
+  
+  --font-body-medium-size: 0.875rem;      /* 14px */
+  --font-body-medium-line-height: 1.25rem; /* 20px */
+  --font-body-medium-weight: 400;
+  --font-body-medium-tracking: 0.025em;
+  
+  --font-body-small-size: 0.75rem;        /* 12px */
+  --font-body-small-line-height: 1rem;    /* 16px */
+  --font-body-small-weight: 400;
+  --font-body-small-tracking: 0.04em;
+  
+  /* Label */
+  --font-label-large-size: 0.875rem;      /* 14px */
+  --font-label-large-line-height: 1.25rem; /* 20px */
+  --font-label-large-weight: 500;
+  --font-label-large-tracking: 0.01em;
+  
+  --font-label-medium-size: 0.75rem;      /* 12px */
+  --font-label-medium-line-height: 1rem;  /* 16px */
+  --font-label-medium-weight: 500;
+  --font-label-medium-tracking: 0.05em;
+  
+  --font-label-small-size: 0.6875rem;     /* 11px */
+  --font-label-small-line-height: 1rem;   /* 16px */
+  --font-label-small-weight: 500;
+  --font-label-small-tracking: 0.05em;
+
+  /* ==========================================================================
+     スペーシングシステム - 8px Grid System
+     ========================================================================== */
+  
+  --spacing-0: 0;
+  --spacing-1: 0.125rem;    /* 2px */
+  --spacing-2: 0.25rem;     /* 4px */
+  --spacing-3: 0.375rem;    /* 6px */
+  --spacing-4: 0.5rem;      /* 8px */
+  --spacing-6: 0.75rem;     /* 12px */
+  --spacing-8: 1rem;        /* 16px */
+  --spacing-10: 1.25rem;    /* 20px */
+  --spacing-12: 1.5rem;     /* 24px */
+  --spacing-16: 2rem;       /* 32px */
+  --spacing-20: 2.5rem;     /* 40px */
+  --spacing-24: 3rem;       /* 48px */
+  --spacing-32: 4rem;       /* 64px */
+  --spacing-40: 5rem;       /* 80px */
+  --spacing-48: 6rem;       /* 96px */
+  --spacing-56: 7rem;       /* 112px */
+  --spacing-64: 8rem;       /* 128px */
+
+  /* ==========================================================================
+     エレベーション（影）システム
+     ========================================================================== */
+  
+  --elevation-0: none;
+  --elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+  --elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15), 0px 2px 3px 0px rgba(0, 0, 0, 0.3);
+  --elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+
+  /* ==========================================================================
+     コンポーネント固有のトークン
+     ========================================================================== */
+  
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-xs: 0.25rem;     /* 4px */
+  --radius-sm: 0.5rem;      /* 8px */
+  --radius-md: 0.75rem;     /* 12px */
+  --radius-lg: 1rem;        /* 16px */
+  --radius-xl: 1.5rem;      /* 24px */
+  --radius-2xl: 2rem;       /* 32px */
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-quick: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-emphasized: 500ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  
+  /* Z-Index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* ==========================================================================
+   ダークテーマ
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark theme semantic colors */
+    --color-surface: var(--color-neutral-10);
+    --color-surface-container: var(--color-neutral-20);
+    --color-surface-container-low: var(--color-neutral-15);
+    --color-surface-container-lowest: var(--color-neutral-4);
+    --color-surface-container-high: var(--color-neutral-24);
+    --color-surface-container-highest: var(--color-neutral-30);
+    --color-surface-dim: var(--color-neutral-6);
+    --color-surface-bright: var(--color-neutral-24);
+    
+    --color-on-surface: var(--color-neutral-90);
+    --color-on-surface-variant: var(--color-neutral-variant-80);
+    
+    --color-outline: var(--color-neutral-variant-60);
+    --color-outline-variant: var(--color-neutral-variant-30);
+    
+    --color-primary: var(--color-primary-80);
+    --color-on-primary: var(--color-primary-20);
+    --color-primary-container: var(--color-primary-30);
+    --color-on-primary-container: var(--color-primary-90);
+    
+    --color-secondary: var(--color-secondary-80);
+    --color-on-secondary: var(--color-secondary-20);
+    --color-secondary-container: var(--color-secondary-30);
+    --color-on-secondary-container: var(--color-secondary-90);
+    
+    --color-tertiary: var(--color-tertiary-80);
+    --color-on-tertiary: var(--color-tertiary-20);
+    --color-tertiary-container: var(--color-tertiary-30);
+    --color-on-tertiary-container: var(--color-tertiary-90);
+    
+    --color-error: var(--color-error-80);
+    --color-on-error: var(--color-error-20);
+    --color-error-container: var(--color-error-30);
+    --color-on-error-container: var(--color-error-90);
+  }
+}
