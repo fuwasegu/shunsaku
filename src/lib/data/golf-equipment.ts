@@ -318,23 +318,48 @@ function calculateVariation(data: number[]): number {
   return Math.sqrt(variance);
 }
 
-// 推奨組み合わせ生成関数（PGlite一時無効化）
+// PGliteを使った推奨組み合わせ生成関数
 export async function generateRecommendations(swingData: SwingData, analysis?: SwingAnalysis): Promise<Combination[]> {
   try {
     console.log('📊 スイングデータから推奨組み合わせを生成中...');
-    console.log('⚠️ PGliteは一時的に無効化されています（デバッグモード）');
+    
+    // データベースを初期化
+    await golfDB.initialize();
     
     // スイングプロファイルを作成
-    const profile = createSwingProfile(swingData, analysis);
-    console.log('スイングプロファイル:', profile);
+    const profileData = createSwingProfile(swingData, analysis);
+    console.log('🎯 スイングプロファイル:', profileData);
     
-    // 従来のロジックを使用（フォールバック）
+    const profileId = await golfDB.createSwingProfile(profileData);
+    console.log('✅ スイングプロファイル作成完了:', profileId);
+    
+    // PGliteから推奨組み合わせを取得
+    const recommendations = await golfDB.getRecommendations(profileId, 3);
+    console.log('📋 推奨組み合わせ取得完了:', recommendations.length, '件');
+    
+    // 既存のCombination型に変換
+    return recommendations.map(rec => ({
+      id: rec.id,
+      head: rec.head,
+      shaft: rec.shaft,
+      reason: rec.reason,
+      expectedEffect: rec.expected_effect,
+      compatibility: rec.compatibility_score
+    }));
+    
+  } catch (error) {
+    console.error('❌ Failed to generate recommendations:', error);
+    
+    // フォールバック: 従来のロジック
+    console.log('🔄 フォールバックモードで推奨組み合わせを生成...');
+    const profile = createSwingProfile(swingData, analysis);
+    
     return [
       {
         id: 'combo-fallback-001',
         head: clubHeads[0],
         shaft: shafts[1],
-        reason: 'デバッグモード: 基本的な組み合わせを表示しています',
+        reason: `パワーレベル${profile.power_level}に適した基本的な組み合わせです`,
         expectedEffect: '安定したパフォーマンス',
         compatibility: 7
       },
@@ -342,7 +367,7 @@ export async function generateRecommendations(swingData: SwingData, analysis?: S
         id: 'combo-fallback-002',
         head: clubHeads[1],
         shaft: shafts[0],
-        reason: 'バランス重視の組み合わせです',
+        reason: `一貫性${profile.consistency}を重視したバランス組み合わせです`,
         expectedEffect: '飛距離と方向性の向上',
         compatibility: 8
       },
@@ -350,21 +375,9 @@ export async function generateRecommendations(swingData: SwingData, analysis?: S
         id: 'combo-fallback-003',
         head: clubHeads[2],
         shaft: shafts[2],
-        reason: 'あなたのスイングに適した組み合わせです',
+        reason: `${profile.swing_type}スイングに適した組み合わせです`,
         expectedEffect: 'ミート率の向上',
         compatibility: 6
-      }
-    ];
-  } catch (error) {
-    console.error('推奨組み合わせ生成エラー:', error);
-    return [
-      {
-        id: 'combo-error-001',
-        head: clubHeads[0],
-        shaft: shafts[0],
-        reason: 'エラーが発生しました。基本的な組み合わせを表示しています。',
-        expectedEffect: '基本性能',
-        compatibility: 5
       }
     ];
   }

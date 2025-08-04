@@ -63,30 +63,48 @@ class GolfDatabase {
   }
 
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      console.log('📋 Database already initialized');
+      return;
+    }
 
     try {
-      console.log('⚠️ PGliteは一時的に無効化されています（デバッグモード）');
-      this.initialized = true;
-      return; // 一時的に無効化
+      console.log('🚀 PGlite初期化開始...');
       
       // PGliteを初期化
       this.db = new PGlite();
+      console.log('✅ PGliteインスタンス作成完了');
 
       // スキーマを読み込み
+      console.log('📋 スキーマファイルを読み込み中...');
       const schemaResponse = await fetch('/schema.sql');
+      if (!schemaResponse.ok) {
+        throw new Error(`Schema fetch failed: ${schemaResponse.status}`);
+      }
+      
       const schema = await schemaResponse.text();
+      console.log(`📄 スキーマファイル読み込み完了 (${schema.length} characters)`);
+      
+      console.log('🏗️ スキーマ実行中...');
       await this.db.exec(schema);
+      console.log('✅ スキーマ実行完了');
 
       // 初期データを投入（開発時のダミーデータ）
       // await this.seedData();
 
       this.initialized = true;
-      console.log('✅ PGlite database initialized successfully');
+      console.log('🎉 PGlite database initialized successfully');
+      
     } catch (error) {
       console.error('❌ Failed to initialize database:', error);
-      this.initialized = true; // エラーでも初期化済みとして扱う
-      return; // エラーを投げない
+      console.error('❌ Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      this.initialized = false;
+      this.db = null;
+      throw error;
     }
   }
 
