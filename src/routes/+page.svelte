@@ -21,6 +21,8 @@
 	let swingAnalysis: SwingAnalysis | null = null;
 	let recommendations: Combination[] = [];
 	let swingVisualizer: SwingVisualizer;
+	let hasPermission: boolean | null = null;
+	let countdown = 0;
 
 	onMount(() => {
 		motionDetector = new MotionDetector({
@@ -29,6 +31,19 @@
 			maxDuration: 5000,
 			samplingRate: 100
 		});
+
+		// センサーサポートと権限を初期チェック
+		if (!motionDetector.isSupported()) {
+			hasPermission = false;
+		} else {
+			// iOS 13+の権限要求が必要かチェック
+			if (typeof DeviceMotionEvent !== 'undefined' && 
+				'requestPermission' in DeviceMotionEvent) {
+				hasPermission = false; // iOS 13+では明示的に許可が必要
+			} else {
+				hasPermission = true; // Android等は自動許可
+			}
+		}
 
 		// エラーハンドリング
 		motionDetector.onError((error) => {
@@ -91,15 +106,24 @@
 				return;
 			}
 
-			// 測定開始
+			// カウントダウン開始
 			currentState = 'measuring';
+			countdown = 3;
 			progressValue = 0;
 			
-			const success = motionDetector.startRecording();
-			if (!success) {
-				errorMessage = '測定の開始に失敗しました';
-				currentState = 'error';
-			}
+			// カウントダウン
+			const countdownInterval = setInterval(() => {
+				countdown--;
+				if (countdown <= 0) {
+					clearInterval(countdownInterval);
+					// 測定開始
+					const success = motionDetector.startRecording();
+					if (!success) {
+						errorMessage = '測定の開始に失敗しました';
+						currentState = 'error';
+					}
+				}
+			}, 1000);
 		} catch (error) {
 			console.error('Measurement start error:', error);
 			errorMessage = '測定中にエラーが発生しました';
