@@ -276,9 +276,9 @@
 			<div class="card card--outlined responsive-margin">
 				<div class="card__content">
 					<div class="m-8">
-						<div class="w-16 h-16 rounded-full surface-container-high flex items-center justify-center m-auto m-4 animate-spin">
-							<span class="headline-medium text-primary">🤖</span>
-						</div>
+											<div class="w-16 h-16 rounded-full surface-container-high flex items-center justify-center m-auto m-4">
+						<span class="headline-medium text-primary">🤖</span>
+					</div>
 						<h2 class="headline-medium text-on-surface m-4">AI解析中...</h2>
 						<p class="body-medium text-on-surface-variant">
 							Gemini AIがあなたのスイングを解析しています
