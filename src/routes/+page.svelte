@@ -508,11 +508,11 @@
 							<p class="mock-text-sm mock-text-gray-700 mock-mb-3">{combo.reason}</p>
 							
 							<div class="mock-flex mock-gap-2">
-								<a href={combo.head.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
-									ヘッド Amazon
-								</a>
-								<a href={combo.shaft.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
-									シャフト Amazon
+								              <a href={combo.head.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
+                ヘッド 商品ページ
+              </a>
+              <a href={combo.shaft.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
+                シャフト 商品ページ
 								</a>
 							</div>
 						</div>
