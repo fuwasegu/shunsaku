@@ -197,75 +197,76 @@
 	}
 </script>
 
-<main class="container responsive-padding">
-	<!-- ヘッダー -->
-	<header class="text-center responsive-margin">
-		<h1 class="responsive-display-large text-on-surface">🏌️ Golf Swing Analyzer</h1>
-		<p class="body-large text-on-surface-variant">
-			スマートフォンを振ってあなたのスイングを解析<br/>
-			最適なクラブとシャフトの組み合わせを提案します
-		</p>
-	</header>
+<main class="gradient-bg">
+	<div class="mobile-container">
+		<!-- ヘッダー -->
+		<header class="mock-text-center mock-mb-8">
+			<h1 class="mock-text-3xl mock-text-gray-900 mock-mb-2">ゴルフスイング解析</h1>
+			<p class="mock-text-gray-600">
+				スマホを振ってスイングを解析し、最適なクラブを提案します
+			</p>
+		</header>
 
 	{#if currentState === 'ready'}
 		<!-- 開始画面 -->
-		<section class="text-center responsive-margin">
-			<div class="card card--elevated responsive-margin">
-				<div class="card__content">
-					<div class="m-8">
-						<div class="w-24 h-24 rounded-full surface-container-high flex items-center justify-center m-auto m-4">
-							<span class="display-medium">📱</span>
-						</div>
-						<h2 class="headline-medium text-on-surface m-4">測定準備完了</h2>
-						<p class="body-medium text-on-surface-variant m-4">
-							スマートフォンをしっかりと握り、<br/>
-							ゴルフスイングの動作を行ってください
-						</p>
-						<div class="responsive-margin">
-							<button class="btn btn--filled" on:click={startMeasurement}>
-								🎯 スイング測定開始
-							</button>
-						</div>
-					</div>
+		<section class="mock-text-center mock-mb-8">
+			<div class="mock-card">
+				<div class="icon-circle--large">
+					<span>📱</span>
 				</div>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">スイング測定の準備</h2>
+				<p class="mock-text-gray-600 mock-mb-4">
+					スマホをしっかりと握り、ゴルフスイングの動作を行ってください
+				</p>
+				<div class="mock-warning-box">
+					<h3 class="mock-warning-title">注意事項</h3>
+					<ul class="mock-warning-list">
+						<li>• スマホを落とさないよう注意してください</li>
+						<li>• 周りに人や物がないことを確認してください</li>
+						<li>• 実際のスイングと同じ動作を行ってください</li>
+					</ul>
+				</div>
+				<button class="mock-btn mock-btn--primary mock-btn--large mock-w-full" on:click={startMeasurement}>
+					スイング解析を開始
+				</button>
 			</div>
 		</section>
 
 	{:else if currentState === 'permission'}
 		<!-- 権限要求中 -->
-		<section class="text-center responsive-margin">
-			<div class="card card--outlined responsive-margin">
-				<div class="card__content">
-					<div class="m-8">
-						<div class="w-16 h-16 rounded-full surface-container-high flex items-center justify-center m-auto m-4">
-							<span class="headline-medium text-primary">🔐</span>
-						</div>
-						<h2 class="headline-medium text-on-surface m-4">センサー権限の確認</h2>
-						<p class="body-medium text-on-surface-variant">
-							デバイスのモーションセンサーへのアクセス許可を確認中...
-						</p>
-					</div>
+		<section class="mock-text-center mock-mb-8">
+			<div class="mock-card">
+				<div class="icon-circle">
+					<span>📱</span>
 				</div>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">センサーアクセス許可</h2>
+				<p class="mock-text-gray-600">
+					スイング解析にはデバイスのモーションセンサーへのアクセスが必要です
+				</p>
 			</div>
 		</section>
 
 	{:else if currentState === 'measuring'}
 		<!-- 測定中 -->
-		<section class="text-center responsive-margin">
-			<div class="card card--filled responsive-margin">
-				<div class="card__content">
-					<div class="m-8">
-						<div class="w-24 h-24 rounded-full surface-container-high flex items-center justify-center m-auto m-4">
-							<span class="display-medium">🏌️</span>
+		<section class="mock-text-center mock-mb-8">
+			<div class="mock-card">
+				{#if countdown > 0}
+					<div>
+						<div class="mock-countdown">{countdown}</div>
+						<p class="mock-text-lg mock-text-gray-600">準備してください...</p>
+					</div>
+				{:else}
+					<div>
+						<div class="mock-animate-pulse">
+							<div class="icon-circle--large">
+								<span class="mock-animate-spin">🏌️</span>
+							</div>
 						</div>
-						<h2 class="headline-medium text-on-surface m-4">測定中...</h2>
-						<p class="body-medium text-on-surface-variant m-4">
-							スマートフォンを持って<br/>
-							ゴルフスイングを行ってください
-						</p>
+						<p class="mock-text-lg mock-text-gray-900 mock-mb-2">スイング測定中...</p>
+						<p class="mock-text-gray-600 mock-mb-4">スマホを振ってスイングしてください</p>
 						
 						<!-- リアルタイムスイング可視化 -->
-						<div class="m-4">
+						<div class="mock-mb-4">
 							<SwingVisualizer 
 								bind:this={swingVisualizer}
 								isRealtime={true}
@@ -274,124 +275,113 @@
 						</div>
 						
 						<!-- プログレスバー -->
-						<div class="progress-container m-4">
-							<div class="progress-bar">
-								<div class="progress-fill" style="width: {progressValue}%"></div>
+						<div class="mock-mb-4">
+							<div class="mock-progress">
+								<div class="mock-progress__fill" style="width: {progressValue}%"></div>
 							</div>
-							<p class="body-small text-on-surface-variant">{Math.round(progressValue)}%</p>
+							<p class="mock-text-sm mock-text-gray-600 mock-mt-4">{Math.round(progressValue)}%</p>
 						</div>
 
-						<div class="flex gap-3 justify-center">
-							<button class="btn btn--outlined" on:click={stopMeasurement}>
-								⏹️ 測定完了
-							</button>
-						</div>
+						<button class="mock-btn mock-btn--outline" on:click={stopMeasurement}>
+							⏹️ 測定完了
+						</button>
 					</div>
-				</div>
+				{/if}
 			</div>
 		</section>
 
 	{:else if currentState === 'analyzing'}
 		<!-- 解析中 -->
-		<section class="text-center responsive-margin">
-			<div class="card card--outlined responsive-margin">
-				<div class="card__content">
-					<div class="m-8">
-											<div class="w-16 h-16 rounded-full surface-container-high flex items-center justify-center m-auto m-4">
-						<span class="headline-medium text-primary">🤖</span>
-					</div>
-						<h2 class="headline-medium text-on-surface m-4">AI解析中...</h2>
-						<p class="body-medium text-on-surface-variant">
-							Gemini AIがあなたのスイングを解析しています
-						</p>
+		<section class="mock-text-center mock-mb-8">
+			<div class="mock-card--outlined">
+				<div class="mock-animate-pulse">
+					<div class="icon-circle">
+						<span class="mock-animate-spin">🔄</span>
 					</div>
 				</div>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">AI解析中...</h2>
+				<p class="mock-text-gray-600">
+					Gemini AIがあなたのスイングを解析しています
+				</p>
 			</div>
 		</section>
 
 	{:else if currentState === 'results' && swingAnalysis}
 		<!-- 結果表示 -->
-		<section class="responsive-margin">
+		<div class="mock-space-y-6">
 			<!-- スイング可視化 -->
-			<div class="card card--elevated responsive-margin">
-				<div class="card__content">
-					<h2 class="headline-large text-on-surface text-center m-4">🎯 あなたのスイング軌道</h2>
-					<div class="text-center m-4">
-						<SwingVisualizer 
-							swingData={swingData}
-							isRealtime={false}
-							isPlaying={false}
-						/>
-						<p class="body-small text-on-surface-variant m-2">
-							💡 青い線がスイング軌道、⚡がインパクトポイントです
-						</p>
-					</div>
+			<div class="mock-card">
+				<h2 class="mock-text-xl mock-text-gray-900 mock-text-center mock-mb-4">🎯 あなたのスイング軌道</h2>
+				<div class="mock-text-center mock-mb-4">
+					<SwingVisualizer 
+						swingData={swingData}
+						isRealtime={false}
+						isPlaying={false}
+					/>
+					<p class="mock-text-sm mock-text-gray-600 mock-mt-4">
+						💡 青い線がスイング軌道、⚡がインパクトポイントです
+					</p>
 				</div>
 			</div>
 
 			<!-- スイング解析結果 -->
-			<div class="card card--elevated responsive-margin">
-				<div class="card__content">
-					<h2 class="headline-large text-on-surface text-center m-4">📊 スイング解析結果</h2>
-					<div class="m-6">
-						<h3 class="title-large text-on-surface m-3">あなたのクセは...</h3>
-						<p class="body-large text-on-surface-variant">{swingAnalysis.swingCharacteristics}</p>
-						
-						<div class="grid-responsive-2 responsive-gap m-4">
-							<div class="text-center">
-								<p class="label-small text-on-surface-variant">スイングタイプ</p>
-								<p class="title-medium text-on-surface">{swingAnalysis.swingType}</p>
-							</div>
-							<div class="text-center">
-								<p class="label-small text-on-surface-variant">テンポ</p>
-								<p class="title-medium text-on-surface">{swingAnalysis.tempo}</p>
-							</div>
-							<div class="text-center">
-								<p class="label-small text-on-surface-variant">一貫性</p>
-								<p class="title-medium text-on-surface">{swingAnalysis.consistency}/10</p>
-							</div>
-							<div class="text-center">
-								<p class="label-small text-on-surface-variant">パワーレベル</p>
-								<p class="title-medium text-on-surface">{swingAnalysis.powerLevel}/10</p>
-							</div>
+			<div class="mock-card">
+				<h2 class="mock-text-xl mock-text-gray-900 mock-flex mock-items-center mock-justify-center mock-gap-2 mock-mb-4">
+					📊 スイング解析結果
+				</h2>
+				<div class="mock-mb-6">
+					<h3 class="mock-text-lg mock-text-gray-900 mock-mb-3">あなたのクセは...</h3>
+					<p class="mock-text-gray-600 mock-mb-4">{swingAnalysis.swingCharacteristics}</p>
+					
+					<div class="mock-grid-2 mock-gap-4">
+						<div class="mock-stat">
+							<div class="mock-stat__value mock-stat__value--green">{swingAnalysis.powerLevel}</div>
+							<div class="mock-stat__label">パワーレベル</div>
+						</div>
+						<div class="mock-stat">
+							<div class="mock-stat__value mock-stat__value--blue">{swingAnalysis.consistency}</div>
+							<div class="mock-stat__label">一貫性</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- 推奨組み合わせ -->
-			<div class="responsive-margin">
-				<h2 class="headline-large text-on-surface text-center m-4">🎯 推奨組み合わせ</h2>
-				<div class="grid-responsive responsive-gap">
+			<div>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-text-center mock-flex mock-items-center mock-justify-center mock-gap-2 mock-mb-4">
+					🏆 おすすめクラブ組み合わせ
+				</h2>
+				<div class="mock-space-y-4">
 					{#each recommendations as combo, index}
-						<div class="card card--outlined">
-							<div class="card__content">
-								<div class="flex items-center gap-2 m-3">
-									<span class="chip chip--suggestion">#{index + 1}</span>
-									<span class="title-medium text-on-surface">適合度 {combo.compatibility}/10</span>
+						<div class="mock-card {index === 0 ? 'ring-primary' : ''}">
+							<div class="mock-flex mock-items-center mock-justify-between mock-mb-3">
+								<div class="mock-flex mock-items-center mock-gap-2">
+									{#if index === 0}
+										<div class="mock-badge mock-badge--success">最適</div>
+									{/if}
+									<span class="mock-text-lg mock-text-gray-900">組み合わせ {index + 1}</span>
 								</div>
-								
-								<h3 class="title-large text-on-surface m-3">
-									{combo.head.name} + {combo.shaft.name}
-								</h3>
-								
-								<div class="m-3">
-									<p class="body-medium text-on-surface-variant m-2">
-										<strong>理由:</strong> {combo.reason}
-									</p>
-									<p class="body-medium text-on-surface-variant m-2">
-										<strong>期待効果:</strong> {combo.expectedEffect}
-									</p>
+								<div class="mock-flex mock-items-center mock-gap-1">
+									<span class="mock-w-4 mock-h-4 mock-text-yellow-500">⚡</span>
+									<span class="mock-text-green-600 font-bold">{combo.compatibility}%</span>
 								</div>
-
-								<div class="flex gap-2 m-3">
-									<a href={combo.head.amazonUrl} target="_blank" class="btn btn--outlined btn--small">
-										ヘッド Amazon
-									</a>
-									<a href={combo.shaft.amazonUrl} target="_blank" class="btn btn--outlined btn--small">
-										シャフト Amazon
-									</a>
-								</div>
+							</div>
+							
+							<div class="mock-mb-3">
+								<div class="mock-text-gray-900 font-semibold">ヘッド: {combo.head.name}</div>
+								<div class="mock-text-gray-900 font-semibold">シャフト: {combo.shaft.name}</div>
+								<div class="mock-text-sm mock-text-gray-600">期待効果: {combo.expectedEffect}</div>
+							</div>
+							
+							<p class="mock-text-sm mock-text-gray-700 mock-mb-3">{combo.reason}</p>
+							
+							<div class="mock-flex mock-gap-2">
+								<a href={combo.head.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
+									ヘッド Amazon
+								</a>
+								<a href={combo.shaft.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
+									シャフト Amazon
+								</a>
 							</div>
 						</div>
 					{/each}
@@ -399,58 +389,31 @@
 			</div>
 
 			<!-- 再測定ボタン -->
-			<div class="text-center responsive-margin">
-				<button class="btn btn--filled" on:click={resetApp}>
-					🔄 再測定する
+			<div class="mock-text-center mock-mt-4">
+				<button class="mock-btn mock-btn--outline mock-w-full" on:click={resetApp}>
+					もう一度測定する
 				</button>
 			</div>
-		</section>
+		</div>
 
 	{:else if currentState === 'error'}
 		<!-- エラー表示 -->
-		<section class="text-center responsive-margin">
-			<div class="card card--outlined responsive-margin">
-				<div class="card__content">
-					<div class="m-8">
-						<div class="w-16 h-16 rounded-full surface-container-high flex items-center justify-center m-auto m-4">
-							<span class="headline-medium text-error">❌</span>
-						</div>
-						<h2 class="headline-medium text-on-surface m-4">エラーが発生しました</h2>
-						<p class="body-medium text-error m-4">{errorMessage}</p>
-						<button class="btn btn--filled" on:click={resetApp}>
-							🔄 再試行
-						</button>
-					</div>
+		<section class="mock-text-center mock-mb-8">
+			<div class="mock-card--outlined">
+				<div class="icon-circle">
+					<span>❌</span>
 				</div>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">エラーが発生しました</h2>
+				<p class="mock-text-gray-600 mock-mb-4">{errorMessage}</p>
+				<button class="mock-btn mock-btn--primary" on:click={resetApp}>
+					🔄 再試行
+				</button>
 			</div>
 		</section>
 	{/if}
+	</div>
 </main>
 
 <style>
-	.progress-container {
-		width: 100%;
-		max-width: 300px;
-		margin: 0 auto;
-	}
-
-	.progress-bar {
-		width: 100%;
-		height: 8px;
-		background-color: var(--color-surface-container-high);
-		border-radius: var(--radius-sm);
-		overflow: hidden;
-	}
-
-	.progress-fill {
-		height: 100%;
-		background-color: var(--color-primary);
-		transition: width 0.3s ease;
-		border-radius: var(--radius-sm);
-	}
-
-	.btn--small {
-		padding: var(--spacing-2) var(--spacing-3);
-		font-size: var(--font-size-small);
-	}
+	/* MockテーマのオーバーライドとカスタムStyleは削除済み */
 </style>

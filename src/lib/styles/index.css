@@ -19,3 +19,6 @@
 
 /* レスポンシブシステムの読み込み */
 @import './responsive.css';
+
+/* Mock.tsx風デザインテーマの読み込み */
+@import './mock-theme.css';

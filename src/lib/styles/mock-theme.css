@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Mock.tsx風のデザインスタイル
+   ========================================================================== */
+
+/* グラデーション背景 */
+.gradient-bg {
+  background: linear-gradient(135deg, 
+    rgb(240, 253, 244) 0%,   /* green-50 */
+    rgb(239, 246, 255) 100%  /* blue-50 */
+  );
+  min-height: 100vh;
+}
+
+/* モバイルファーストのコンテナ */
+.mobile-container {
+  max-width: 28rem; /* 448px - mobile max width */
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Mock風カードスタイル */
+.mock-card {
+  background-color: white;
+  border-radius: 0.75rem; /* 12px */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.mock-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.mock-card--elevated {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.mock-card--outlined {
+  border: 1px solid rgb(229, 231, 235); /* gray-200 */
+  box-shadow: none;
+}
+
+/* リング強調 */
+.ring-primary {
+  box-shadow: 0 0 0 2px rgb(34, 197, 94); /* green-500 */
+}
+
+/* アイコン円形背景 */
+.icon-circle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background-color: rgb(249, 250, 251); /* gray-50 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+  font-size: 2rem;
+}
+
+.icon-circle--large {
+  width: 6rem;
+  height: 6rem;
+  font-size: 3rem;
+}
+
+/* Mock風ボタン */
+.mock-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.mock-btn--primary {
+  background-color: rgb(34, 197, 94); /* green-500 */
+  color: white;
+}
+
+.mock-btn--primary:hover {
+  background-color: rgb(22, 163, 74); /* green-600 */
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.mock-btn--outline {
+  background-color: transparent;
+  color: rgb(75, 85, 99); /* gray-600 */
+  border: 1px solid rgb(209, 213, 219); /* gray-300 */
+}
+
+.mock-btn--outline:hover {
+  background-color: rgb(249, 250, 251); /* gray-50 */
+  border-color: rgb(156, 163, 175); /* gray-400 */
+}
+
+.mock-btn--large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.mock-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* プログレスバー */
+.mock-progress {
+  width: 100%;
+  max-width: 18.75rem; /* 300px */
+  margin: 0 auto;
+  background-color: rgb(243, 244, 246); /* gray-100 */
+  border-radius: 0.25rem;
+  overflow: hidden;
+  height: 0.5rem;
+}
+
+.mock-progress__fill {
+  height: 100%;
+  background-color: rgb(34, 197, 94); /* green-500 */
+  transition: width 0.3s ease;
+  border-radius: 0.25rem;
+}
+
+/* バッジ */
+.mock-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mock-badge--success {
+  background-color: rgb(34, 197, 94); /* green-500 */
+  color: white;
+}
+
+.mock-badge--secondary {
+  background-color: rgb(243, 244, 246); /* gray-100 */
+  color: rgb(75, 85, 99); /* gray-600 */
+}
+
+.mock-badge--warning {
+  background-color: rgb(251, 191, 36); /* yellow-400 */
+  color: rgb(92, 53, 0); /* yellow-900 */
+}
+
+/* グリッドレイアウト */
+.mock-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.mock-grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .mock-grid-responsive {
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  }
+}
+
+/* 統計値表示 */
+.mock-stat {
+  text-align: center;
+}
+
+.mock-stat__value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.mock-stat__value--green {
+  color: rgb(34, 197, 94); /* green-500 */
+}
+
+.mock-stat__value--blue {
+  color: rgb(59, 130, 246); /* blue-500 */
+}
+
+.mock-stat__value--purple {
+  color: rgb(147, 51, 234); /* purple-500 */
+}
+
+.mock-stat__value--orange {
+  color: rgb(249, 115, 22); /* orange-500 */
+}
+
+.mock-stat__label {
+  font-size: 0.875rem;
+  color: rgb(107, 114, 128); /* gray-500 */
+}
+
+/* アニメーション */
+.mock-animate-pulse {
+  animation: mock-pulse 2s infinite;
+}
+
+@keyframes mock-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.mock-animate-spin {
+  animation: mock-spin 1s linear infinite;
+}
+
+@keyframes mock-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* カウントダウン表示 */
+.mock-countdown {
+  font-size: 4rem;
+  font-weight: 700;
+  color: rgb(34, 197, 94); /* green-500 */
+  margin-bottom: 1rem;
+}
+
+/* 警告ボックス */
+.mock-warning-box {
+  background-color: rgb(254, 252, 232); /* yellow-50 */
+  border: 1px solid rgb(253, 224, 71); /* yellow-300 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.mock-warning-title {
+  font-weight: 600;
+  color: rgb(146, 64, 14); /* yellow-800 */
+  margin-bottom: 0.5rem;
+}
+
+.mock-warning-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mock-warning-list li {
+  font-size: 0.875rem;
+  color: rgb(161, 98, 7); /* yellow-700 */
+  margin-bottom: 0.25rem;
+}
+
+/* スペーシング */
+.mock-space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.mock-space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* テキストアライメント */
+.mock-text-center {
+  text-align: center;
+}
+
+/* フレックスレイアウト */
+.mock-flex {
+  display: flex;
+}
+
+.mock-flex-col {
+  flex-direction: column;
+}
+
+.mock-items-center {
+  align-items: center;
+}
+
+.mock-justify-center {
+  justify-content: center;
+}
+
+.mock-justify-between {
+  justify-content: space-between;
+}
+
+.mock-gap-1 {
+  gap: 0.25rem;
+}
+
+.mock-gap-2 {
+  gap: 0.5rem;
+}
+
+.mock-gap-3 {
+  gap: 0.75rem;
+}
+
+.mock-gap-4 {
+  gap: 1rem;
+}
+
+/* 幅・高さ */
+.mock-w-full {
+  width: 100%;
+}
+
+.mock-h-4 {
+  height: 1rem;
+}
+
+.mock-h-5 {
+  height: 1.25rem;
+}
+
+.mock-w-4 {
+  width: 1rem;
+}
+
+.mock-w-5 {
+  width: 1.25rem;
+}
+
+/* マージン・パディング */
+.mock-mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mock-mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mock-mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mock-mt-4 {
+  margin-top: 1rem;
+}
+
+.mock-mr-2 {
+  margin-right: 0.5rem;
+}
+
+.mock-p-4 {
+  padding: 1rem;
+}
+
+/* フレックスラップ */
+.mock-flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* レスポンシブタイポグラフィ */
+.mock-text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+}
+
+.mock-text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+
+.mock-text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.mock-text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.mock-text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.mock-text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* カラー */
+.mock-text-gray-900 {
+  color: rgb(17, 24, 39);
+}
+
+.mock-text-gray-600 {
+  color: rgb(75, 85, 99);
+}
+
+.mock-text-gray-700 {
+  color: rgb(55, 65, 81);
+}
+
+.mock-text-green-600 {
+  color: rgb(22, 163, 74);
+}
+
+.mock-text-yellow-500 {
+  color: rgb(234, 179, 8);
+}
+
+/* フォント重み */
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+/* レスポンシブ対応 */
+@media (min-width: 640px) {
+  .mobile-container {
+    padding: 1.5rem;
+  }
+  
+  .mock-text-3xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
