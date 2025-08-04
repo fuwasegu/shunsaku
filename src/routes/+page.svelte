@@ -309,6 +309,11 @@
 			<p class="mock-text-gray-600">
 				スマホを振ってスイングを解析し、最適なクラブを提案します
 			</p>
+			<nav class="mock-mt-4">
+				<a href="/equipment" class="equipment-nav-link">
+					📋 取扱機材一覧を見る
+				</a>
+			</nav>
 		</header>
 
 		<!-- デバッグパネル（PC環境または明示的にデバッグモードが有効な場合） -->
