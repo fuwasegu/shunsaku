@@ -88,7 +88,7 @@
 				labels: swingData.timestamp,
 				datasets: [
 					{
-						label: 'X軸 (deg/s)',
+						label: 'X軸 - 左右の回転 (deg/s)',
 						data: swingData.gyroscope.x,
 						borderColor: '#ef4444',
 						backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -97,7 +97,7 @@
 						borderWidth: 2
 					},
 					{
-						label: 'Y軸 (deg/s)',
+						label: 'Y軸 - 上下の回転 (deg/s)',
 						data: swingData.gyroscope.y,
 						borderColor: '#10b981',
 						backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -106,7 +106,7 @@
 						borderWidth: 2
 					},
 					{
-						label: 'Z軸 (deg/s)',
+						label: 'Z軸 - 前後の回転 (deg/s)',
 						data: swingData.gyroscope.z,
 						borderColor: '#3b82f6',
 						backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -160,7 +160,7 @@
 				labels: swingData.timestamp,
 				datasets: [
 					{
-						label: 'X軸 (m/s²)',
+						label: 'X軸 - 左右の加速度 (m/s²)',
 						data: swingData.accelerometer.x,
 						borderColor: '#ec4899',
 						backgroundColor: 'rgba(236, 72, 153, 0.1)',
@@ -169,7 +169,7 @@
 						borderWidth: 2
 					},
 					{
-						label: 'Y軸 (m/s²)',
+						label: 'Y軸 - 上下の加速度 (m/s²)',
 						data: swingData.accelerometer.y,
 						borderColor: '#8b5cf6',
 						backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -178,7 +178,7 @@
 						borderWidth: 2
 					},
 					{
-						label: 'Z軸 (m/s²)',
+						label: 'Z軸 - 前後の加速度 (m/s²)',
 						data: swingData.accelerometer.z,
 						borderColor: '#06b6d4',
 						backgroundColor: 'rgba(6, 182, 212, 0.1)',

@@ -40,6 +40,73 @@
 		}
 	});
 
+	function createCustomAxes() {
+		const axisLength = 12;
+		const axisThickness = 0.05;
+
+		// X軸（赤）- 左右の動き
+		const xGeometry = new THREE.CylinderGeometry(axisThickness, axisThickness, axisLength);
+		const xMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0x440000 });
+		const xAxis = new THREE.Mesh(xGeometry, xMaterial);
+		xAxis.rotation.z = Math.PI / 2;
+		xAxis.position.x = axisLength / 2;
+		scene.add(xAxis);
+
+		// X軸の矢印
+		const xArrowGeometry = new THREE.ConeGeometry(axisThickness * 3, axisThickness * 8);
+		const xArrow = new THREE.Mesh(xArrowGeometry, xMaterial);
+		xArrow.rotation.z = -Math.PI / 2;
+		xArrow.position.x = axisLength;
+		scene.add(xArrow);
+
+		// Y軸（緑）- 上下の動き
+		const yGeometry = new THREE.CylinderGeometry(axisThickness, axisThickness, axisLength);
+		const yMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00, emissive: 0x004400 });
+		const yAxis = new THREE.Mesh(yGeometry, yMaterial);
+		yAxis.position.y = axisLength / 2;
+		scene.add(yAxis);
+
+		// Y軸の矢印
+		const yArrowGeometry = new THREE.ConeGeometry(axisThickness * 3, axisThickness * 8);
+		const yArrow = new THREE.Mesh(yArrowGeometry, yMaterial);
+		yArrow.position.y = axisLength;
+		scene.add(yArrow);
+
+		// Z軸（青）- 前後の動き
+		const zGeometry = new THREE.CylinderGeometry(axisThickness, axisThickness, axisLength);
+		const zMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff, emissive: 0x000044 });
+		const zAxis = new THREE.Mesh(zGeometry, zMaterial);
+		zAxis.rotation.x = Math.PI / 2;
+		zAxis.position.z = axisLength / 2;
+		scene.add(zAxis);
+
+		// Z軸の矢印
+		const zArrowGeometry = new THREE.ConeGeometry(axisThickness * 3, axisThickness * 8);
+		const zArrow = new THREE.Mesh(zArrowGeometry, zMaterial);
+		zArrow.rotation.x = -Math.PI / 2;
+		zArrow.position.z = axisLength;
+		scene.add(zArrow);
+
+		// テキストラベルは CSS2DRenderer を使わずに、シンプルなジオメトリで表現
+		// 各軸の端に小さな識別マーカーを追加
+		addAxisLabel('X', axisLength + 1, 0, 0, 0xff0000);
+		addAxisLabel('Y', 0, axisLength + 1, 0, 0x00ff00);
+		addAxisLabel('Z', 0, 0, axisLength + 1, 0x0000ff);
+	}
+
+	function addAxisLabel(label: string, x: number, y: number, z: number, color: number) {
+		// 簡単な球体でラベルポイントを表現
+		const labelGeometry = new THREE.SphereGeometry(0.2);
+		const labelMaterial = new THREE.MeshPhongMaterial({ 
+			color: color, 
+			emissive: color, 
+			emissiveIntensity: 0.3 
+		});
+		const labelMesh = new THREE.Mesh(labelGeometry, labelMaterial);
+		labelMesh.position.set(x, y, z);
+		scene.add(labelMesh);
+	}
+
 	async function initThreeJS() {
 		// シーンの作成
 		scene = new THREE.Scene();
@@ -78,9 +145,8 @@
 			const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0xcccccc);
 			scene.add(gridHelper);
 
-			// 軸の表示
-			const axesHelper = new THREE.AxesHelper(10);
-			scene.add(axesHelper);
+			// カスタム軸の表示（より明確に）
+			createCustomAxes();
 		}
 
 		// OrbitControlsの追加（動的インポート）
@@ -321,17 +387,40 @@
 	<div class="canvas-container" bind:this={container}></div>
 	
 	<div class="legend">
-		<div class="legend-item">
-			<div class="legend-marker legend-marker--start"></div>
-			<span>開始点</span>
+		<div class="legend-section">
+			<h5 class="legend-title">🎯 スイングポイント</h5>
+			<div class="legend-items">
+				<div class="legend-item">
+					<div class="legend-marker legend-marker--start"></div>
+					<span>開始点</span>
+				</div>
+				<div class="legend-item">
+					<div class="legend-marker legend-marker--impact"></div>
+					<span>インパクト</span>
+				</div>
+				<div class="legend-item">
+					<div class="legend-marker legend-marker--end"></div>
+					<span>終了点</span>
+				</div>
+			</div>
 		</div>
-		<div class="legend-item">
-			<div class="legend-marker legend-marker--impact"></div>
-			<span>インパクト</span>
-		</div>
-		<div class="legend-item">
-			<div class="legend-marker legend-marker--end"></div>
-			<span>終了点</span>
+		
+		<div class="legend-section">
+			<h5 class="legend-title">📐 座標軸の説明</h5>
+			<div class="legend-items">
+				<div class="legend-item">
+					<div class="axis-marker axis-marker--x"></div>
+					<span><strong>X軸（赤）</strong>: 左右の動き</span>
+				</div>
+				<div class="legend-item">
+					<div class="axis-marker axis-marker--y"></div>
+					<span><strong>Y軸（緑）</strong>: 上下の動き</span>
+				</div>
+				<div class="legend-item">
+					<div class="axis-marker axis-marker--z"></div>
+					<span><strong>Z軸（青）</strong>: 前後の動き</span>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -417,17 +506,39 @@
 
 	.legend {
 		background: #f8fafc;
-		padding: 12px 20px;
-		display: flex;
-		gap: 20px;
+		padding: 16px 20px;
 		border-top: 1px solid #e2e8f0;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 24px;
+	}
+
+	.legend-section {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.legend-title {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #334155;
+		margin: 0 0 8px 0;
+		border-bottom: 1px solid #e2e8f0;
+		padding-bottom: 4px;
+	}
+
+	.legend-items {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
 	}
 
 	.legend-item {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		font-size: 0.9rem;
+		font-size: 0.85rem;
 		color: #475569;
 	}
 
@@ -435,6 +546,7 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
+		flex-shrink: 0;
 	}
 
 	.legend-marker--start {
@@ -448,6 +560,28 @@
 
 	.legend-marker--end {
 		background: #44ff44;
+	}
+
+	.axis-marker {
+		width: 16px;
+		height: 4px;
+		border-radius: 2px;
+		flex-shrink: 0;
+	}
+
+	.axis-marker--x {
+		background: linear-gradient(90deg, #ff0000, #ff4444);
+		box-shadow: 0 0 4px rgba(255, 0, 0, 0.3);
+	}
+
+	.axis-marker--y {
+		background: linear-gradient(90deg, #00ff00, #44ff44);
+		box-shadow: 0 0 4px rgba(0, 255, 0, 0.3);
+	}
+
+	.axis-marker--z {
+		background: linear-gradient(90deg, #0000ff, #4444ff);
+		box-shadow: 0 0 4px rgba(0, 0, 255, 0.3);
 	}
 
 	@keyframes pulse {
@@ -467,8 +601,17 @@
 		}
 
 		.legend {
-			flex-wrap: wrap;
-			gap: 12px;
+			grid-template-columns: 1fr;
+			gap: 16px;
+			padding: 12px 16px;
+		}
+
+		.legend-items {
+			gap: 4px;
+		}
+
+		.legend-item {
+			font-size: 0.8rem;
 		}
 	}
 </style>
