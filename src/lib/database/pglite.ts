@@ -20,7 +20,7 @@ export interface Shaft {
   flex: 'L' | 'A' | 'R' | 'S' | 'X';
   weight: number;
   torque: number;
-  kick_point: 'low' | 'mid' | 'high';
+  kick_point: 'low' | 'mid' | 'high' | 'mid-low' | 'mid-high';
   characteristics: string[];
   price: number;
   amazon_url: string;
