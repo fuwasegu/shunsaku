@@ -260,7 +260,7 @@ export const shafts: Shaft[] = [
   }
 ];
 
-// import { golfDB } from '$lib/database/pglite.js'; // 一時的に無効化
+import { golfDB } from '$lib/database/pglite.js';
 import type { SwingData, SwingAnalysis } from '$lib/api/gemini.js';
 
 // スイングデータからプロファイルを作成する関数
@@ -350,34 +350,94 @@ export async function generateRecommendations(swingData: SwingData, analysis?: S
   } catch (error) {
     console.error('❌ Failed to generate recommendations:', error);
     
-    // フォールバック: 従来のロジック
+    // フォールバック: 従来のロジック（実際のマスターデータベース）
     console.log('🔄 フォールバックモードで推奨組み合わせを生成...');
     const profile = createSwingProfile(swingData, analysis);
     
     return [
       {
         id: 'combo-fallback-001',
-        head: clubHeads[0],
-        shaft: shafts[1],
-        reason: `パワーレベル${profile.power_level}に適した基本的な組み合わせです`,
-        expectedEffect: '安定したパフォーマンス',
-        compatibility: 7
-      },
-      {
-        id: 'combo-fallback-002',
-        head: clubHeads[1],
-        shaft: shafts[0],
-        reason: `一貫性${profile.consistency}を重視したバランス組み合わせです`,
-        expectedEffect: '飛距離と方向性の向上',
+        head: {
+          id: 'head-callaway-paradym-ai-smoke-max',
+          name: 'Callaway Paradym Ai SMOKE MAX Driver',
+          brand: 'Callaway',
+          type: 'driver',
+          loft: 10.5,
+          characteristics: ['AIスマートフェース', 'ミスヒット軽減', '低スピン'],
+          price: 32800,
+          amazonUrl: 'https://item.rakuten.co.jp/alpen/0146864914/'
+        },
+        shaft: {
+          id: 'shaft-fujikura-speeder-nx-green',
+          name: 'Fujikura Speeder NX GREEN',
+          brand: 'Fujikura',
+          flex: 'S',
+          weight: 66.5,
+          torque: 3.8,
+          kickPoint: 'mid',
+          characteristics: ['スムーズなフィーリング', '一体感のある挙動'],
+          price: 44000,
+          amazonUrl: 'https://store.shopping.yahoo.co.jp/htcgolf/nx-green-custom.html'
+        },
+        reason: `パワーレベル${profile.power_level}、一貫性${profile.consistency}に適した組み合わせです`,
+        expectedEffect: 'AIスマートフェース×スムーズシャフトで安定性向上',
         compatibility: 8
       },
       {
+        id: 'combo-fallback-002',
+        head: {
+          id: 'head-ping-g430-max',
+          name: 'PING G430 MAX Driver',
+          brand: 'PING',
+          type: 'driver',
+          loft: 10.5,
+          characteristics: ['高MOI', '寛容性', '直進性'],
+          price: 93500,
+          amazonUrl: 'https://clubping.jp/product/product2022_g430_d.html'
+        },
+        shaft: {
+          id: 'shaft-mitsubishi-tensei-pro-blue-1k',
+          name: 'Mitsubishi Chemical TENSEI Pro Blue 1K',
+          brand: 'Mitsubishi Chemical',
+          flex: 'S',
+          weight: 54,
+          torque: 3.7,
+          kickPoint: 'mid',
+          characteristics: ['スタンダード', 'クセが少ない'],
+          price: 55000,
+          amazonUrl: 'https://mitsubishigolf.com/products/tensei-1k-pro-blue'
+        },
+        reason: `${profile.swing_type}スイング（テンポ：${profile.tempo}）に最適化`,
+        expectedEffect: 'PINGの寛容性×軽量シャフトで飛距離アップ',
+        compatibility: 7
+      },
+      {
         id: 'combo-fallback-003',
-        head: clubHeads[2],
-        shaft: shafts[2],
-        reason: `${profile.swing_type}スイングに適した組み合わせです`,
-        expectedEffect: 'ミート率の向上',
-        compatibility: 6
+        head: {
+          id: 'head-titleist-tsr2',
+          name: 'Titleist TSR2 Driver',
+          brand: 'Titleist',
+          type: 'driver',
+          loft: 10.0,
+          characteristics: ['直進性', '飛距離重視', '低スピン'],
+          price: 61600,
+          amazonUrl: 'https://www.golfdo.com/club/list/30505/1'
+        },
+        shaft: {
+          id: 'shaft-fujikura-ventus-black',
+          name: 'Fujikura VENTUS BLACK',
+          brand: 'Fujikura',
+          flex: 'S',
+          weight: 66.0,
+          torque: 3.2,
+          kickPoint: 'high',
+          characteristics: ['叩ける', 'スピン量抑制'],
+          price: 55000,
+          amazonUrl: 'https://kasorebase.com/shopdetail/000000001311/'
+        },
+        reason: `パワーヒッター向け（最大回転率：${profile.max_rotation_rate?.toFixed(1)}）`,
+        expectedEffect: 'Titleist×VENTUS BLACKで低スピン・高初速',
+        compatibility: 9
       }
     ];
   }
