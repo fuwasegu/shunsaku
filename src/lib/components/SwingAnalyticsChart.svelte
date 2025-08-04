@@ -587,7 +587,7 @@
 
 	.charts-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: 1fr;
 		gap: 20px;
 	}
 
@@ -605,7 +605,7 @@
 	}
 
 	.chart-container--wide {
-		grid-column: span 2;
+		grid-column: span 1;
 		height: 320px;
 	}
 
@@ -649,10 +649,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.charts-grid {
-			grid-template-columns: 1fr;
-		}
-
 		.chart-container {
 			height: 240px;
 		}

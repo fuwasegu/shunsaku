@@ -432,7 +432,7 @@
 
 	.insights-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		grid-template-columns: 1fr;
 		gap: 16px;
 	}
 
@@ -520,10 +520,6 @@
 	@media (max-width: 768px) {
 		.insights-container {
 			padding: 16px;
-		}
-
-		.insights-grid {
-			grid-template-columns: 1fr;
 		}
 
 		.summary-stats {
