@@ -26,10 +26,10 @@
 
 	onMount(() => {
 		motionDetector = new MotionDetector({
-			threshold: 5.0,
-			minDuration: 500,
-			maxDuration: 5000,
-			samplingRate: 100
+			threshold: 8.0,  // より高い閾値でスイング検出
+			minDuration: 800, // 最小スイング時間
+			maxDuration: 10000, // 最大待機時間（10秒）
+			samplingRate: 50  // より高頻度でサンプリング
 		});
 
 		// センサーサポートと権限を初期チェック
@@ -54,7 +54,8 @@
 		// データ取得中の進捗更新
 		motionDetector.onData((reading) => {
 			const count = motionDetector.getReadingsCount();
-			progressValue = Math.min(100, (count / 30) * 100); // 約3秒で100%
+			const maxTime = 10; // 最大10秒
+			progressValue = Math.min(100, (reading.timestamp / (maxTime * 1000)) * 100);
 			
 			// リアルタイム可視化更新
 			if (swingVisualizer && currentState === 'measuring') {
@@ -326,9 +327,9 @@
 							<p class="mock-text-sm mock-text-gray-600 mock-mt-4">{Math.round(progressValue)}%</p>
 						</div>
 
-						<button class="mock-btn mock-btn--outline" on:click={stopMeasurement}>
-							⏹️ 測定完了
-						</button>
+						<p class="mock-text-sm mock-text-gray-600">
+							スイングを検知すると自動的に解析を開始します
+						</p>
 					</div>
 				{/if}
 			</div>

@@ -36,10 +36,10 @@ export class MotionDetector {
 
   constructor(config: Partial<SwingDetectionConfig> = {}) {
     this.config = {
-      threshold: 5.0, // rad/s for gyroscope
-      minDuration: 500, // 0.5 seconds
-      maxDuration: 3000, // 3 seconds
-      samplingRate: 100, // 100ms
+      threshold: 8.0, // rad/s for gyroscope (より高い閾値でスイング検出)
+      minDuration: 800, // 0.8 seconds (最小スイング時間)
+      maxDuration: 10000, // 10 seconds (最大待機時間)
+      samplingRate: 50, // 50ms (より高頻度でサンプリング)
       ...config
     };
   }
@@ -170,8 +170,17 @@ export class MotionDetector {
       reading.gyroscope.z ** 2
     );
 
-    // 閾値を超えた動作を検出
-    if (gyroMagnitude > this.config.threshold) {
+    // 加速度の合成値も計算（よりよいスイング検出のため）
+    const accelMagnitude = Math.sqrt(
+      reading.accelerometer.x ** 2 + 
+      reading.accelerometer.y ** 2 + 
+      reading.accelerometer.z ** 2
+    );
+
+    // スイングらしい動作を検出（ジャイロ + 加速度の組み合わせ）
+    if (gyroMagnitude > this.config.threshold && accelMagnitude > 2.0) {
+      console.log(`スイング動作検出: ジャイロ=${gyroMagnitude.toFixed(2)}, 加速度=${accelMagnitude.toFixed(2)}`);
+      
       // 一定時間後に自動停止するタイマーをリセット
       if (this.swingDetectionTimer) {
         clearTimeout(this.swingDetectionTimer);
@@ -179,12 +188,13 @@ export class MotionDetector {
 
       this.swingDetectionTimer = setTimeout(() => {
         if (this.isRecording && reading.timestamp > this.config.minDuration) {
+          console.log('スイング完了を検出、解析を開始します');
           const swingData = this.stopRecording();
           if (swingData) {
             this.onSwingDetectedCallback?.(swingData);
           }
         }
-      }, 1000); // 1秒間動作が収まったら終了
+      }, 1500); // 1.5秒間動作が収まったら終了
     }
   }
 
