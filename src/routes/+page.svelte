@@ -9,6 +9,7 @@
 	import type { SwingData, SwingAnalysis } from '$lib/api/gemini.js';
 	import type { Combination } from '$lib/data/golf-equipment.js';
 	import { generateRecommendations } from '$lib/data/golf-equipment.js';
+	import SwingVisualizer from '$lib/components/SwingVisualizer.svelte';
 
 	// アプリの状態管理
 	type AppState = 'ready' | 'permission' | 'measuring' | 'analyzing' | 'results' | 'error';
@@ -19,6 +20,7 @@
 	let swingData: SwingData | null = null;
 	let swingAnalysis: SwingAnalysis | null = null;
 	let recommendations: Combination[] = [];
+	let swingVisualizer: SwingVisualizer;
 
 	onMount(() => {
 		motionDetector = new MotionDetector({
@@ -38,6 +40,11 @@
 		motionDetector.onData((reading) => {
 			const count = motionDetector.getReadingsCount();
 			progressValue = Math.min(100, (count / 30) * 100); // 約3秒で100%
+			
+			// リアルタイム可視化更新
+			if (swingVisualizer && currentState === 'measuring') {
+				swingVisualizer.addRealtimeData(reading);
+			}
 		});
 
 		// スイング検出完了
@@ -182,6 +189,11 @@
 		recommendations = [];
 		progressValue = 0;
 		errorMessage = '';
+		
+		// スイング可視化をリセット
+		if (swingVisualizer) {
+			swingVisualizer.resetAnimation();
+		}
 	}
 </script>
 
@@ -252,6 +264,15 @@
 							ゴルフスイングを行ってください
 						</p>
 						
+						<!-- リアルタイムスイング可視化 -->
+						<div class="m-4">
+							<SwingVisualizer 
+								bind:this={swingVisualizer}
+								isRealtime={true}
+								swingData={null}
+							/>
+						</div>
+						
 						<!-- プログレスバー -->
 						<div class="progress-container m-4">
 							<div class="progress-bar">
@@ -291,6 +312,23 @@
 	{:else if currentState === 'results' && swingAnalysis}
 		<!-- 結果表示 -->
 		<section class="responsive-margin">
+			<!-- スイング可視化 -->
+			<div class="card card--elevated responsive-margin">
+				<div class="card__content">
+					<h2 class="headline-large text-on-surface text-center m-4">🎯 あなたのスイング軌道</h2>
+					<div class="text-center m-4">
+						<SwingVisualizer 
+							swingData={swingData}
+							isRealtime={false}
+							isPlaying={false}
+						/>
+						<p class="body-small text-on-surface-variant m-2">
+							💡 青い線がスイング軌道、⚡がインパクトポイントです
+						</p>
+					</div>
+				</div>
+			</div>
+
 			<!-- スイング解析結果 -->
 			<div class="card card--elevated responsive-margin">
 				<div class="card__content">
@@ -409,15 +447,6 @@
 		background-color: var(--color-primary);
 		transition: width 0.3s ease;
 		border-radius: var(--radius-sm);
-	}
-
-	.animate-spin {
-		animation: spin 2s linear infinite;
-	}
-
-	@keyframes spin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
 	}
 
 	.btn--small {

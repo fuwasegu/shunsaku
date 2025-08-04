@@ -230,3 +230,4 @@ export class MotionDetector {
 }
 
 export default MotionDetector;
+export type { MotionReading, SwingDetectionConfig };
