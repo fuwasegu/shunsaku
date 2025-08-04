@@ -11,6 +11,9 @@
 	import { generateRecommendations } from '$lib/data/golf-equipment.js';
 	import { loadMasterData, verifyData } from '$lib/database/data-loader.js';
 	import SwingVisualizer from '$lib/components/SwingVisualizer.svelte';
+	import SwingAnalyticsChart from '$lib/components/SwingAnalyticsChart.svelte';
+	import Swing3DVisualizer from '$lib/components/Swing3DVisualizer.svelte';
+	import SwingInsights from '$lib/components/SwingInsights.svelte';
 	import DebugPanel from '$lib/components/DebugPanel.svelte';
 	import DebugConsole from '$lib/components/DebugConsole.svelte';
 	import { debugMode, addDebugLog, isPCEnvironment } from '$lib/stores/debug.js';
@@ -213,7 +216,7 @@
 			}
 
 					swingAnalysis = await response.json();
-							recommendations = await generateRecommendations(data, swingAnalysis);
+							recommendations = await generateRecommendations(data, swingAnalysis || undefined);
 		currentState = 'results';
 		} catch (error) {
 			console.error('Analysis error:', error);
@@ -441,9 +444,12 @@
 	{:else if currentState === 'results' && swingAnalysis}
 		<!-- 結果表示 -->
 		<div class="mock-space-y-6">
-			<!-- スイング可視化 -->
+			<!-- 3Dスイング可視化 -->
+			<Swing3DVisualizer swingData={swingData} />
+			
+			<!-- 従来の2Dスイング可視化 -->
 			<div class="mock-card">
-				<h2 class="mock-text-xl mock-text-gray-900 mock-text-center mock-mb-4">🎯 あなたのスイング軌道</h2>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-text-center mock-mb-4">🎯 2Dスイング軌道</h2>
 				<div class="mock-text-center mock-mb-4">
 					<SwingVisualizer 
 						swingData={swingData}
@@ -477,6 +483,12 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- スイング分析レポート -->
+			<SwingInsights swingData={swingData} {swingAnalysis} />
+
+			<!-- 詳細分析チャート -->
+			<SwingAnalyticsChart swingData={swingData} title="📈 詳細データ分析" />
 
 			<!-- 推奨組み合わせ -->
 			<div>

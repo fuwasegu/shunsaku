@@ -25,6 +25,9 @@
 	},
 	"dependencies": {
 		"@electric-sql/pglite": "^0.3.6",
-		"@vercel/analytics": "^1.5.0"
+		"@types/three": "^0.178.1",
+		"@vercel/analytics": "^1.5.0",
+		"chart.js": "^4.5.0",
+		"three": "^0.179.1"
 	}
 }
