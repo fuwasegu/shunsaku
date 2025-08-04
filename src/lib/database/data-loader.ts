@@ -13,9 +13,14 @@ export async function loadMasterData(): Promise<void> {
     // データベースを初期化
     await golfDB.initialize();
     
-    // 初期化完了の確認
-    if (!(golfDB as any).initialized) {
-      throw new Error('Database initialization failed');
+    // 初期化完了の確認（新しいメソッドを使用）
+    if (!golfDB.isInitialized()) {
+      throw new Error('Database initialization failed - connection not available');
+    }
+    
+    const db = golfDB.getDB();
+    if (!db) {
+      throw new Error('Database connection is null after initialization');
     }
     
     console.log('📋 データベース初期化完了、マスターデータを読み込み中...');
@@ -29,8 +34,8 @@ export async function loadMasterData(): Promise<void> {
     const masterData: MasterData = await response.json();
     console.log(`📥 JSONデータ取得完了: ヘッド${masterData.club_heads.length}件, シャフト${masterData.shafts.length}件`);
     
-    // 既存データをクリア（初期化後）
-    await clearExistingData();
+    // 既存データをクリア（テーブル存在確認後）
+    await clearExistingDataSafely(db);
     
     // データを投入
     await insertClubHeads(masterData.club_heads);
@@ -51,22 +56,30 @@ export async function loadMasterData(): Promise<void> {
   }
 }
 
-async function clearExistingData(): Promise<void> {
+async function clearExistingDataSafely(db: any): Promise<void> {
   try {
-    const db = (golfDB as any).db;
-    if (!db) {
-      throw new Error('Database connection not available');
-    }
-    
     console.log('🧹 既存データをクリア中...');
     
-    // リレーション順序を考慮して削除
-    await db.query('DELETE FROM recommendations');
-    await db.query('DELETE FROM swing_profiles');
-    await db.query('DELETE FROM shafts');
-    await db.query('DELETE FROM club_heads');
+    // テーブル存在確認とデータクリア
+    const tables = ['recommendations', 'swing_profiles', 'shafts', 'club_heads'];
     
-    console.log('✅ 既存データをクリアしました');
+    for (const table of tables) {
+      try {
+        // テーブル存在確認
+        const result = await db.query(`SELECT COUNT(*) FROM ${table}`);
+        console.log(`  📋 ${table}: ${result.rows[0].count}件のデータを確認`);
+        
+        // データ削除
+        await db.query(`DELETE FROM ${table}`);
+        console.log(`  🗑️ ${table}: データクリア完了`);
+        
+      } catch (tableError) {
+        console.log(`  ⚠️ ${table}: テーブルが存在しないか、アクセスできません - スキップ`);
+        // テーブルが存在しない場合はスキップ（新規データベースの場合）
+      }
+    }
+    
+    console.log('✅ 既存データクリア完了');
     
   } catch (error) {
     console.error('❌ データクリアに失敗:', error);
@@ -76,7 +89,7 @@ async function clearExistingData(): Promise<void> {
 
 async function insertClubHeads(clubHeads: ClubHead[]): Promise<void> {
   try {
-    const db = (golfDB as any).db;
+    const db = golfDB.getDB();
     if (!db) {
       throw new Error('Database connection not available');
     }
@@ -114,7 +127,7 @@ async function insertClubHeads(clubHeads: ClubHead[]): Promise<void> {
 
 async function insertShafts(shafts: Shaft[]): Promise<void> {
   try {
-    const db = (golfDB as any).db;
+    const db = golfDB.getDB();
     if (!db) {
       throw new Error('Database connection not available');
     }
@@ -154,7 +167,7 @@ async function insertShafts(shafts: Shaft[]): Promise<void> {
 // 開発用のデータ確認関数
 export async function verifyData(): Promise<void> {
   try {
-    const db = (golfDB as any).db;
+    const db = golfDB.getDB();
     if (!db) {
       throw new Error('Database connection not available');
     }

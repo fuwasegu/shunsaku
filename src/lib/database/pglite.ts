@@ -52,6 +52,16 @@ class GolfDatabase {
   private db: PGlite | null = null;
   private initialized = false;
 
+  // データベース接続を取得
+  getDB(): PGlite | null {
+    return this.db;
+  }
+
+  // 初期化状態を取得
+  isInitialized(): boolean {
+    return this.initialized && this.db !== null;
+  }
+
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
