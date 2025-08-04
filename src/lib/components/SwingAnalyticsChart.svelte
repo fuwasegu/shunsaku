@@ -9,9 +9,13 @@
 	let gyroCanvas: HTMLCanvasElement;
 	let accelCanvas: HTMLCanvasElement;
 	let analysisCanvas: HTMLCanvasElement;
+	let vectorCanvas: HTMLCanvasElement;
+	let axisCompareCanvas: HTMLCanvasElement;
 	let gyroChart: Chart;
 	let accelChart: Chart;
 	let analysisChart: Chart;
+	let vectorChart: Chart;
+	let axisCompareChart: Chart;
 
 	// スイング解析データ
 	let swingPhases: { backswing: number; downswing: number; followthrough: number } = {
@@ -34,6 +38,8 @@
 		if (gyroChart) gyroChart.destroy();
 		if (accelChart) accelChart.destroy();
 		if (analysisChart) analysisChart.destroy();
+		if (vectorChart) vectorChart.destroy();
+		if (axisCompareChart) axisCompareChart.destroy();
 	});
 
 	function analyzeSwingData() {
@@ -77,6 +83,8 @@
 		createGyroChart();
 		createAccelChart();
 		createAnalysisChart();
+		createVectorChart();
+		createAxisCompareChart();
 	}
 
 	function createGyroChart() {
@@ -262,6 +270,183 @@
 		});
 	}
 
+	function createVectorChart() {
+		const ctx = vectorCanvas.getContext('2d')!;
+		
+		// 3軸の合成ベクトルを計算
+		const gyroMagnitudes = swingData.gyroscope.x.map((x, i) => 
+			Math.sqrt(x ** 2 + swingData.gyroscope.y[i] ** 2 + swingData.gyroscope.z[i] ** 2)
+		);
+		
+		const accelMagnitudes = swingData.accelerometer.x.map((x, i) => 
+			Math.sqrt(x ** 2 + swingData.accelerometer.y[i] ** 2 + swingData.accelerometer.z[i] ** 2)
+		);
+		
+		vectorChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: swingData.timestamp,
+				datasets: [
+					{
+						label: '🌪️ 角速度ベクトル合成値 (deg/s)',
+						data: gyroMagnitudes,
+						borderColor: '#7c3aed',
+						backgroundColor: 'rgba(124, 58, 237, 0.1)',
+						tension: 0.4,
+						pointRadius: 1,
+						borderWidth: 3,
+						fill: true
+					},
+					{
+						label: '🚀 加速度ベクトル合成値 (m/s²)',
+						data: accelMagnitudes,
+						borderColor: '#dc2626',
+						backgroundColor: 'rgba(220, 38, 38, 0.1)',
+						tension: 0.4,
+						pointRadius: 1,
+						borderWidth: 3,
+						yAxisID: 'y1'
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: {
+					intersect: false,
+					mode: 'index'
+				},
+				plugins: {
+					title: {
+						display: true,
+						text: '🎯 3軸合成ベクトル（総合的な動きの強さ）',
+						font: { size: 16, weight: 'bold' as const }
+					},
+					legend: {
+						position: 'top' as const
+					}
+				},
+				scales: {
+					x: {
+						title: {
+							display: true,
+							text: '時間 (ms)'
+						}
+					},
+					y: {
+						type: 'linear',
+						display: true,
+						position: 'left' as const,
+						title: {
+							display: true,
+							text: '角速度 (deg/s)'
+						}
+					},
+					y1: {
+						type: 'linear',
+						display: true,
+						position: 'right' as const,
+						title: {
+							display: true,
+							text: '加速度 (m/s²)'
+						},
+						grid: {
+							drawOnChartArea: false,
+						},
+					}
+				}
+			}
+		});
+	}
+
+	function createAxisCompareChart() {
+		const ctx = axisCompareCanvas.getContext('2d')!;
+		
+		// 各軸の最大値、平均値、標準偏差を計算
+		const gyroStats = {
+			x: {
+				max: Math.max(...swingData.gyroscope.x.map(Math.abs)),
+				avg: swingData.gyroscope.x.reduce((a, b) => a + Math.abs(b), 0) / swingData.gyroscope.x.length,
+			},
+			y: {
+				max: Math.max(...swingData.gyroscope.y.map(Math.abs)),
+				avg: swingData.gyroscope.y.reduce((a, b) => a + Math.abs(b), 0) / swingData.gyroscope.y.length,
+			},
+			z: {
+				max: Math.max(...swingData.gyroscope.z.map(Math.abs)),
+				avg: swingData.gyroscope.z.reduce((a, b) => a + Math.abs(b), 0) / swingData.gyroscope.z.length,
+			}
+		};
+		
+		axisCompareChart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: ['X軸 (左右)', 'Y軸 (上下)', 'Z軸 (前後)'],
+				datasets: [
+					{
+						label: '最大角速度 (deg/s)',
+						data: [gyroStats.x.max, gyroStats.y.max, gyroStats.z.max],
+						backgroundColor: [
+							'rgba(239, 68, 68, 0.8)',   // 赤
+							'rgba(16, 185, 129, 0.8)',  // 緑
+							'rgba(59, 130, 246, 0.8)'   // 青
+						],
+						borderColor: [
+							'rgba(239, 68, 68, 1)',
+							'rgba(16, 185, 129, 1)',
+							'rgba(59, 130, 246, 1)'
+						],
+						borderWidth: 2
+					},
+					{
+						label: '平均角速度 (deg/s)',
+						data: [gyroStats.x.avg, gyroStats.y.avg, gyroStats.z.avg],
+						backgroundColor: [
+							'rgba(239, 68, 68, 0.4)',
+							'rgba(16, 185, 129, 0.4)',
+							'rgba(59, 130, 246, 0.4)'
+						],
+						borderColor: [
+							'rgba(239, 68, 68, 0.8)',
+							'rgba(16, 185, 129, 0.8)',
+							'rgba(59, 130, 246, 0.8)'
+						],
+						borderWidth: 1
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					title: {
+						display: true,
+						text: '📐 3軸別影響度比較',
+						font: { size: 16, weight: 'bold' as const }
+					},
+					legend: {
+						position: 'top' as const
+					}
+				},
+				scales: {
+					x: {
+						title: {
+							display: true,
+							text: '軸の方向'
+						}
+					},
+					y: {
+						title: {
+							display: true,
+							text: '角速度 (deg/s)'
+						},
+						beginAtZero: true
+					}
+				}
+			}
+		});
+	}
+
 	$: if (swingData) {
 		analyzeSwingData();
 		// チャートが既に存在する場合は更新
@@ -269,6 +454,8 @@
 			gyroChart.destroy();
 			accelChart.destroy();
 			analysisChart.destroy();
+			if (vectorChart) vectorChart.destroy();
+			if (axisCompareChart) axisCompareChart.destroy();
 			createCharts();
 		}
 	}
@@ -299,6 +486,16 @@
 
 	<!-- チャート表示 -->
 	<div class="charts-grid">
+		<!-- 3軸合成ベクトルチャート (新しく追加) -->
+		<div class="chart-container chart-container--wide">
+			<canvas bind:this={vectorCanvas} width="800" height="300"></canvas>
+		</div>
+
+		<!-- 3軸比較チャート (新しく追加) -->
+		<div class="chart-container">
+			<canvas bind:this={axisCompareCanvas} width="400" height="250"></canvas>
+		</div>
+
 		<!-- ジャイロスコープチャート -->
 		<div class="chart-container">
 			<canvas bind:this={gyroCanvas} width="400" height="250"></canvas>
@@ -405,6 +602,11 @@
 
 	.chart-container--small {
 		grid-column: span 1;
+	}
+
+	.chart-container--wide {
+		grid-column: span 2;
+		height: 320px;
 	}
 
 	.analysis-details {
