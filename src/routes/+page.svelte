@@ -9,7 +9,11 @@
 	import type { SwingData, SwingAnalysis } from '$lib/api/gemini.js';
 	import type { Combination } from '$lib/data/golf-equipment.js';
 	import { generateRecommendations } from '$lib/data/golf-equipment.js';
+	import { loadMasterData, verifyData } from '$lib/database/data-loader.js';
 	import SwingVisualizer from '$lib/components/SwingVisualizer.svelte';
+	import DebugPanel from '$lib/components/DebugPanel.svelte';
+	import DebugConsole from '$lib/components/DebugConsole.svelte';
+	import { debugMode, addDebugLog, isPCEnvironment } from '$lib/stores/debug.js';
 
 	// アプリの状態管理
 	type AppState = 'ready' | 'permission' | 'measuring' | 'analyzing' | 'results' | 'error';
@@ -24,7 +28,30 @@
 	let hasPermission: boolean | null = null;
 	let countdown = 0;
 
-	onMount(() => {
+	onMount(async () => {
+		// PC環境の場合、デバッグ情報を表示
+		console.log('onMount実行開始');
+		const isPC = isPCEnvironment();
+		console.log('isPCEnvironment結果:', isPC);
+		
+		if (isPC) {
+			addDebugLog('info', 'アプリケーション開始 - PC環境を検出');
+		}
+		
+		// 強制的にデバッグモードを有効化（テスト用）
+		debugMode.set(true);
+		addDebugLog('info', 'デバッグモードを強制有効化');
+
+		// マスターデータを読み込み
+		try {
+			await loadMasterData();
+			await verifyData();
+			addDebugLog('info', 'マスターデータの読み込み完了');
+		} catch (error) {
+			console.error('マスターデータの読み込みに失敗しました:', error);
+			addDebugLog('error', 'マスターデータの読み込みに失敗', { error });
+		}
+
 		motionDetector = new MotionDetector({
 			threshold: 8.0,  // より高い閾値でスイング検出
 			minDuration: 800, // 最小スイング時間
@@ -35,13 +62,16 @@
 		// センサーサポートと権限を初期チェック
 		if (!motionDetector.isSupported()) {
 			hasPermission = false;
+			addDebugLog('warn', 'センサーがサポートされていません');
 		} else {
 			// iOS 13+の権限要求が必要かチェック
 			if (typeof DeviceMotionEvent !== 'undefined' && 
 				'requestPermission' in DeviceMotionEvent) {
 				hasPermission = false; // iOS 13+では明示的に許可が必要
+				addDebugLog('info', 'iOS 13+を検出、権限要求が必要');
 			} else {
 				hasPermission = true; // Android等は自動許可
+				addDebugLog('info', '権限要求不要のデバイス');
 			}
 		}
 
@@ -49,6 +79,7 @@
 		motionDetector.onError((error) => {
 			errorMessage = error;
 			currentState = 'error';
+			addDebugLog('error', 'Motion Detector エラー', { error });
 		});
 
 		// データ取得中の進捗更新
@@ -159,7 +190,7 @@
 			}
 
 					swingAnalysis = await response.json();
-		recommendations = await generateRecommendations(data, swingAnalysis);
+							recommendations = await generateRecommendations(data, swingAnalysis);
 		currentState = 'results';
 		} catch (error) {
 			console.error('Analysis error:', error);
@@ -178,7 +209,7 @@
 				]
 			};
 
-					recommendations = await generateRecommendations(data, swingAnalysis);
+					recommendations = await generateRecommendations(data, swingAnalysis || undefined);
 		currentState = 'results';
 		}
 	}
@@ -236,6 +267,14 @@
 		if (swingVisualizer) {
 			swingVisualizer.resetAnimation();
 		}
+		
+		addDebugLog('info', 'アプリケーションリセット');
+	}
+
+	// デバッグパネルからのモックスイング生成処理
+	function handleMockSwingGenerated(swingData: SwingData) {
+		currentState = 'analyzing';
+		analyzeSwing(swingData);
 	}
 </script>
 
@@ -248,6 +287,14 @@
 				スマホを振ってスイングを解析し、最適なクラブを提案します
 			</p>
 		</header>
+
+		<!-- デバッグパネル（PC環境または明示的にデバッグモードが有効な場合） -->
+		{#if isPCEnvironment() || $debugMode}
+			<DebugPanel 
+				{motionDetector}
+				onMockSwingGenerated={handleMockSwingGenerated}
+			/>
+		{/if}
 
 	{#if currentState === 'ready'}
 		<!-- 開始画面 -->
@@ -456,6 +503,11 @@
 	{/if}
 	</div>
 </main>
+
+<!-- デバッグコンソール（デバッグモードまたはPC環境でのみ表示） -->
+{#if $debugMode || isPCEnvironment()}
+	<DebugConsole />
+{/if}
 
 <style>
 	/* MockテーマのオーバーライドとカスタムStyleは削除済み */

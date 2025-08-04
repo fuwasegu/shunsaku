@@ -1,0 +1,236 @@
+{
+  "club_heads": [
+    {
+      "id": "head-taylormade-qi35-max",
+      "name": "TaylorMade Qi35 MAX Driver",
+      "brand": "TaylorMade",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["高弾道", "寛容性", "飛距離重視", "安定性", "直進性"],
+      "price": 99000,
+      "amazon_url": "https://www.taylormadegolf.jp/taylormadegolf-drivers/Qi35-MAX-%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC/DW-TF861.html?lang=ja_JP",
+      "image_url": ""
+    },
+    {
+      "id": "head-callaway-paradym-ai-smoke-max",
+      "name": "Callaway Paradym Ai SMOKE MAX Driver",
+      "brand": "Callaway",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["AIスマートフェース", "ミスヒット軽減", "飛距離重視", "寛容性", "軽量設計", "高初速", "安定性", "直進性", "低スピン", "打感良好", "打音良好"],
+      "price": 32800,
+      "amazon_url": "https://item.rakuten.co.jp/alpen/0146864914/",
+      "image_url": ""
+    },
+    {
+      "id": "head-ping-g430-max",
+      "name": "PING G430 MAX Driver",
+      "brand": "PING",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["高MOI", "寛容性", "直進性", "飛距離重視", "快音", "低スピン", "安定性", "ミスヒットに強い", "打感良好"],
+      "price": 93500,
+      "amazon_url": "https://clubping.jp/product/product2022_g430_d.html",
+      "image_url": ""
+    },
+    {
+      "id": "head-dunlop-xxio-13",
+      "name": "DUNLOP XXIO 13 Driver",
+      "brand": "DUNLOP",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["高弾道", "飛距離重視", "直進性", "やさしい", "高初速", "安定性", "打感良好"],
+      "price": 92400,
+      "amazon_url": "https://kakaku.com/item/K0001584133/",
+      "image_url": ""
+    },
+    {
+      "id": "head-titleist-tsr2",
+      "name": "Titleist TSR2 Driver",
+      "brand": "Titleist",
+      "type": "driver",
+      "loft": 10.0,
+      "characteristics": ["直進性", "飛距離重視", "高弾道", "低スピン", "寛容性", "打感良好", "打音上品", "ミスヒットに強い"],
+      "price": 61600,
+      "amazon_url": "https://www.golfdo.com/club/list/30505/1",
+      "image_url": ""
+    },
+    {
+      "id": "head-bridgestone-b2-ht",
+      "name": "BRIDGESTONE B2 HT Driver",
+      "brand": "BRIDGESTONE",
+      "type": "driver",
+      "loft": 9.5,
+      "characteristics": ["つかまり重視", "高弾道", "ウェイト可変機構", "安定性", "直進性", "低スピン", "打感良好", "スライサー向け", "ミスヒットに強い"],
+      "price": 85800,
+      "amazon_url": "https://lesson.golfdigest.co.jp/gear/catalogue/driver/gca000015898701.html",
+      "image_url": ""
+    },
+    {
+      "id": "head-yamaha-rmx-vd",
+      "name": "YAMAHA RMX VD Driver",
+      "brand": "YAMAHA",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["高初速", "コントロール性能", "ツアーアスリートモデル", "ブルズアイフェース", "ロフト可変", "重心深度調整", "打感良好", "振りやすい", "バランス重視", "ミスヒットに強い"],
+      "price": 105600,
+      "amazon_url": "https://golf.yamaha.com/products/rmx_vd_r_dr.html",
+      "image_url": ""
+    },
+    {
+      "id": "head-onoff-aka",
+      "name": "ONOFF AKA Driver",
+      "brand": "ONOFF",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["高初速", "強弾道", "低スピン", "寛容性", "ドローバイアス", "打感良好", "可変ウェイト", "アベレージヒッター向け", "安定性", "直進性"],
+      "price": 85800,
+      "amazon_url": "https://www.golfdo.com/catalog/club/0000000000000410",
+      "image_url": ""
+    },
+    {
+      "id": "head-honma-beres-aizu",
+      "name": "HONMA BERES AIZU Driver",
+      "brand": "HONMA",
+      "type": "driver",
+      "loft": 9.5,
+      "characteristics": ["高性能", "高品質", "高反発", "高初速", "高弾道", "直進性", "ミスヒットに強い", "低重心", "安定性", "スイングスピード向上"],
+      "price": 110000,
+      "amazon_url": "https://honmagolf-ec.com/club/driver/br081w-az2s23642335",
+      "image_url": ""
+    },
+    {
+      "id": "head-mizuno-st-max-230",
+      "name": "Mizuno ST-MAX 230 Driver",
+      "brand": "Mizuno",
+      "type": "driver",
+      "loft": 10.5,
+      "characteristics": ["飛距離重視", "寛容性", "高MOI", "高弾道", "中スピン", "軽量設計", "直進性", "打感良好"],
+      "price": 66000,
+      "amazon_url": "https://www.fairwaygolfusa.com/category/select/pid/720222/language/ja",
+      "image_url": ""
+    }
+  ],
+  "shafts": [
+    {
+      "id": "shaft-mitsubishi-tensei-av-raw-white",
+      "name": "Mitsubishi Chemical TENSEI AV RAW White",
+      "brand": "Mitsubishi Chemical",
+      "flex": "S",
+      "weight": 65,
+      "torque": 3.8,
+      "kick_point": "mid",
+      "characteristics": ["アベレージゴルファー向け", "振りやすい", "つかまり重視", "高弾道", "安定性"],
+      "price": 25300,
+      "amazon_url": "https://www.teeolive.net/view/item/000000002019"
+    },
+    {
+      "id": "shaft-fujikura-speeder-nx-green",
+      "name": "Fujikura Speeder NX GREEN",
+      "brand": "Fujikura",
+      "flex": "S",
+      "weight": 66.5,
+      "torque": 3.8,
+      "kick_point": "mid",
+      "characteristics": ["スムーズなフィーリング", "一体感のある挙動", "クラブスピード向上", "ボールスピード向上", "先端剛性", "強弾道", "低スピン", "左に飛びにくい", "振りやすい"],
+      "price": 44000,
+      "amazon_url": "https://store.shopping.yahoo.co.jp/htcgolf/nx-green-custom.html"
+    },
+    {
+      "id": "shaft-graphitedesign-tour-ad-vf",
+      "name": "Graphite Design Tour AD VF",
+      "brand": "Graphite Design",
+      "flex": "S",
+      "weight": 65,
+      "torque": 3.3,
+      "kick_point": "mid-low",
+      "characteristics": ["強く叩ける", "軽やかな振り抜き", "元調子進化系", "振り遅れ抑制", "もたつき抑制", "タメの強い切り返し", "エネルギー伝達最大化", "打点散らばり抑制", "スピン量抑制", "ボール初速向上"],
+      "price": 46200,
+      "amazon_url": "https://tourad.gd-inc.co.jp/product/tour-ad-vf/"
+    },
+    {
+      "id": "shaft-ustmamiya-attas-king",
+      "name": "UST Mamiya ATTAS KING",
+      "brand": "UST Mamiya",
+      "flex": "S",
+      "weight": 66,
+      "torque": 3.5,
+      "kick_point": "low",
+      "characteristics": ["つかまり重視", "飛距離重視", "先調子", "四軸織物", "柔らかい打感", "振りやすさ", "高弾性", "高強度", "ブレ抑制", "スライス抑制"],
+      "price": 44000,
+      "amazon_url": "https://ustmamiya.co.jp/product/attas_king/"
+    },
+    {
+      "id": "shaft-fujikura-ventus-tr-red",
+      "name": "Fujikura VENTUS TR RED",
+      "brand": "Fujikura",
+      "flex": "S",
+      "weight": 59.5,
+      "torque": 3.3,
+      "kick_point": "mid-low",
+      "characteristics": ["クセがない", "軽快な振り抜き", "操作性", "粘る", "ヘッドのねじれ抑制", "ボール初速向上", "球の散らばり抑制"],
+      "price": 51100,
+      "amazon_url": "https://www.fairwaygolfusa.com/category/select/pid/585467/language/ja"
+    },
+    {
+      "id": "shaft-graphitedesign-tour-ad-cq",
+      "name": "Graphite Design Tour AD CQ",
+      "brand": "Graphite Design",
+      "flex": "S",
+      "weight": 65,
+      "torque": 3.2,
+      "kick_point": "mid",
+      "characteristics": ["正確性", "飛距離"],
+      "price": 44000,
+      "amazon_url": "https://kakaku.com/item/S0000954013/"
+    },
+    {
+      "id": "shaft-ustmamiya-lin-q-white-ex",
+      "name": "UST Mamiya LIN-Q WHITE EX",
+      "brand": "UST Mamiya",
+      "flex": "S",
+      "weight": 58,
+      "torque": 3.4,
+      "kick_point": "low",
+      "characteristics": ["厚いインパクト", "安定性", "ハードヒッター向け", "ブレ抑制", "飛距離重視"],
+      "price": 55000,
+      "amazon_url": "https://golfscale.jp/shaft/ustmamiya/lin-q-white-ex_series"
+    },
+    {
+      "id": "shaft-mitsubishi-diamana-tb",
+      "name": "Mitsubishi Chemical Diamana TB",
+      "brand": "Mitsubishi Chemical",
+      "flex": "S",
+      "weight": 65,
+      "torque": 3.5,
+      "kick_point": "mid-high",
+      "characteristics": ["安定性", "飛距離", "コントロール"],
+      "price": 29430,
+      "amazon_url": "https://store.shopping.yahoo.co.jp/golfhands/mrc-dtb.html"
+    },
+    {
+      "id": "shaft-fujikura-ventus-black",
+      "name": "Fujikura VENTUS BLACK",
+      "brand": "Fujikura",
+      "flex": "S",
+      "weight": 66.0,
+      "torque": 3.2,
+      "kick_point": "high",
+      "characteristics": ["叩ける", "スピン量抑制", "力強い弾道", "安定性"],
+      "price": 55000,
+      "amazon_url": "https://kasorebase.com/shopdetail/000000001311/"
+    },
+    {
+      "id": "shaft-mitsubishi-tensei-pro-blue-1k",
+      "name": "Mitsubishi Chemical TENSEI Pro Blue 1K",
+      "brand": "Mitsubishi Chemical",
+      "flex": "S",
+      "weight": 54,
+      "torque": 3.7,
+      "kick_point": "mid",
+      "characteristics": ["スタンダード", "クセが少ない", "ほどよい捕まり", "スピン量最適化"],
+      "price": 55000,
+      "amazon_url": "https://mitsubishigolf.com/products/tensei-1k-pro-blue"
+    }
+  ]
+}

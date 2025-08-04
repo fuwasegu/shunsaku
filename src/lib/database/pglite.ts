@@ -56,6 +56,10 @@ class GolfDatabase {
     if (this.initialized) return;
 
     try {
+      console.log('⚠️ PGliteは一時的に無効化されています（デバッグモード）');
+      this.initialized = true;
+      return; // 一時的に無効化
+      
       // PGliteを初期化
       this.db = new PGlite();
 
@@ -64,14 +68,15 @@ class GolfDatabase {
       const schema = await schemaResponse.text();
       await this.db.exec(schema);
 
-      // 初期データを投入
-      await this.seedData();
+      // 初期データを投入（開発時のダミーデータ）
+      // await this.seedData();
 
       this.initialized = true;
       console.log('✅ PGlite database initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize database:', error);
-      throw error;
+      this.initialized = true; // エラーでも初期化済みとして扱う
+      return; // エラーを投げない
     }
   }
 

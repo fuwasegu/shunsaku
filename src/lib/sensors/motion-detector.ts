@@ -1,4 +1,6 @@
 import type { SwingData } from '$lib/api/gemini.js';
+import { MockMotionGenerator, mockSwingPresets } from './mock-motion-generator.js';
+import { addDebugLog, isPCEnvironment } from '$lib/stores/debug.js';
 
 export interface MotionReading {
   gyroscope: {
@@ -33,6 +35,10 @@ export class MotionDetector {
   private motionHandler?: (event: DeviceMotionEvent) => void;
   private swingDetectionTimer?: NodeJS.Timeout;
   private lastMotionTime = 0;
+  
+  // デバッグモード関連
+  private debugMode = false;
+  private mockGenerator?: MockMotionGenerator;
 
   constructor(config: Partial<SwingDetectionConfig> = {}) {
     this.config = {
@@ -42,49 +48,69 @@ export class MotionDetector {
       samplingRate: 50, // 50ms (より高頻度でサンプリング)
       ...config
     };
+    
+    // PC環境の場合、自動的にデバッグモードを有効にする
+    if (isPCEnvironment()) {
+      this.debugMode = true;
+      addDebugLog('info', 'PC環境を検出、デバッグモードを有効化');
+    }
   }
 
   async requestPermission(): Promise<boolean> {
     try {
-      console.log('Checking device motion support...');
+      addDebugLog('info', 'センサー権限の確認を開始');
+      
+      // デバッグモードの場合は常に許可
+      if (this.debugMode) {
+        addDebugLog('info', 'デバッグモード: 権限要求をスキップ');
+        return true;
+      }
       
       // 基本的なサポート確認
       if (typeof DeviceMotionEvent === 'undefined') {
-        console.log('DeviceMotionEvent not supported');
+        addDebugLog('warn', 'DeviceMotionEventがサポートされていません');
         return false;
       }
 
       // iOS 13+ では明示的な権限要求が必要
       if ('requestPermission' in DeviceMotionEvent && 
           typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-        console.log('Requesting permission on iOS...');
+        addDebugLog('info', 'iOS権限要求を実行中...');
         const permission = await (DeviceMotionEvent as any).requestPermission();
-        console.log('Permission result:', permission);
+        addDebugLog('info', `権限要求結果: ${permission}`);
         return permission === 'granted';
       }
       
       // Android や古いiOSでは自動的に利用可能
-      console.log('Permission not required on this device');
+      addDebugLog('info', 'このデバイスでは権限要求は不要');
       return true;
     } catch (error) {
-      console.error('Permission request failed:', error);
+      addDebugLog('error', '権限要求エラー', error);
       this.onErrorCallback?.(`権限要求エラー: ${error}`);
       return false;
     }
   }
 
   isSupported(): boolean {
+    // デバッグモードの場合は常にサポート
+    if (this.debugMode) {
+      return true;
+    }
+    
     return typeof DeviceMotionEvent !== 'undefined' && 
            typeof DeviceOrientationEvent !== 'undefined';
   }
 
   startRecording(): boolean {
     if (!this.isSupported()) {
-      this.onErrorCallback?.('デバイスがセンサーに対応していません');
+      const error = 'デバイスがセンサーに対応していません';
+      addDebugLog('error', error);
+      this.onErrorCallback?.(error);
       return false;
     }
 
     if (this.isRecording) {
+      addDebugLog('warn', '既に記録中です');
       return false;
     }
 
@@ -93,6 +119,55 @@ export class MotionDetector {
     this.startTime = Date.now();
     this.lastMotionTime = 0;
 
+    addDebugLog('info', 'センサー記録開始', { 
+      debugMode: this.debugMode,
+      config: this.config 
+    });
+
+    // デバッグモードの場合はモックデータを使用
+    if (this.debugMode) {
+      this.startMockRecording();
+    } else {
+      this.startRealRecording();
+    }
+
+    // 最大記録時間でタイムアウト
+    this.swingDetectionTimer = setTimeout(() => {
+      if (this.isRecording) {
+        addDebugLog('warn', '最大記録時間に達したため記録を停止');
+        this.stopRecording();
+      }
+    }, this.config.maxDuration);
+
+    return true;
+  }
+  
+  private startMockRecording() {
+    addDebugLog('info', 'モック記録を開始');
+    
+    // ランダムなプリセットを選択
+    const presetNames = Object.keys(mockSwingPresets) as Array<keyof typeof mockSwingPresets>;
+    const randomPreset = presetNames[Math.floor(Math.random() * presetNames.length)];
+    const preset = mockSwingPresets[randomPreset];
+    
+    addDebugLog('info', `使用するプリセット: ${randomPreset}`, preset);
+    
+    this.mockGenerator = new MockMotionGenerator(preset);
+    
+    this.mockGenerator.startRealTimeGeneration((reading) => {
+      if (!this.isRecording) return;
+      
+      this.readings.push(reading);
+      this.onDataCallback?.(reading);
+      
+      // スイング検出ロジック
+      this.detectSwingMotion(reading);
+    });
+  }
+  
+  private startRealRecording() {
+    addDebugLog('info', 'リアルセンサー記録を開始');
+    
     this.motionHandler = (event: DeviceMotionEvent) => {
       if (!this.isRecording) return;
 
@@ -128,24 +203,24 @@ export class MotionDetector {
     };
 
     window.addEventListener('devicemotion', this.motionHandler);
-
-    // 最大記録時間でタイムアウト
-    this.swingDetectionTimer = setTimeout(() => {
-      if (this.isRecording) {
-        this.stopRecording();
-      }
-    }, this.config.maxDuration);
-
-    return true;
   }
 
   stopRecording(): SwingData | null {
     if (!this.isRecording) {
+      addDebugLog('warn', '記録が開始されていません');
       return null;
     }
 
     this.isRecording = false;
+    addDebugLog('info', `記録停止 - ${this.readings.length}件のデータを取得`);
 
+    // モック生成器の停止
+    if (this.mockGenerator) {
+      this.mockGenerator.stopRealTimeGeneration();
+      this.mockGenerator = undefined;
+    }
+
+    // リアルセンサーのクリーンアップ
     if (this.motionHandler) {
       window.removeEventListener('devicemotion', this.motionHandler);
     }
@@ -155,10 +230,16 @@ export class MotionDetector {
     }
 
     if (this.readings.length === 0) {
+      addDebugLog('warn', 'データが取得されませんでした');
       return null;
     }
 
     const swingData = this.processReadings();
+    addDebugLog('info', 'スイングデータ処理完了', {
+      duration: swingData.duration,
+      samples: swingData.gyroscope.x.length
+    });
+    
     return swingData;
   }
 
@@ -179,7 +260,11 @@ export class MotionDetector {
 
     // スイングらしい動作を検出（ジャイロ + 加速度の組み合わせ）
     if (gyroMagnitude > this.config.threshold && accelMagnitude > 2.0) {
-      console.log(`スイング動作検出: ジャイロ=${gyroMagnitude.toFixed(2)}, 加速度=${accelMagnitude.toFixed(2)}`);
+      addDebugLog('info', `スイング動作検出`, {
+        gyro: gyroMagnitude.toFixed(2),
+        accel: accelMagnitude.toFixed(2),
+        timestamp: reading.timestamp
+      });
       
       // 一定時間後に自動停止するタイマーをリセット
       if (this.swingDetectionTimer) {
@@ -188,7 +273,7 @@ export class MotionDetector {
 
       this.swingDetectionTimer = setTimeout(() => {
         if (this.isRecording && reading.timestamp > this.config.minDuration) {
-          console.log('スイング完了を検出、解析を開始します');
+          addDebugLog('info', 'スイング完了を検出、解析を開始');
           const swingData = this.stopRecording();
           if (swingData) {
             this.onSwingDetectedCallback?.(swingData);
@@ -248,6 +333,41 @@ export class MotionDetector {
   // 設定の更新
   updateConfig(newConfig: Partial<SwingDetectionConfig>) {
     this.config = { ...this.config, ...newConfig };
+    addDebugLog('info', '設定更新', this.config);
+  }
+  
+  // デバッグモードの制御
+  setDebugMode(enabled: boolean) {
+    this.debugMode = enabled;
+    addDebugLog('info', `デバッグモード: ${enabled ? '有効' : '無効'}`);
+  }
+  
+  getDebugMode(): boolean {
+    return this.debugMode;
+  }
+  
+  // 手動でモックスイングを生成
+  generateMockSwing(preset?: keyof typeof mockSwingPresets): SwingData {
+    const presetName = preset || 'intermediate';
+    const presetConfig = mockSwingPresets[presetName];
+    
+    addDebugLog('info', `手動モックスイング生成: ${presetName}`);
+    
+    const generator = new MockMotionGenerator(presetConfig);
+    const readings = generator.generateSwingData();
+    
+    // 一時的にreadingsを設定してprocessReadingsを呼び出し
+    const originalReadings = this.readings;
+    this.readings = readings;
+    const swingData = this.processReadings();
+    this.readings = originalReadings;
+    
+    addDebugLog('info', 'モックスイング生成完了', {
+      duration: swingData.duration,
+      samples: swingData.gyroscope.x.length
+    });
+    
+    return swingData;
   }
 }
 
