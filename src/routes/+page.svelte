@@ -29,18 +29,23 @@
 	let countdown = 0;
 
 	onMount(async () => {
-		// PC環境の場合、デバッグ情報を表示
-		console.log('onMount実行開始');
+		// デバッグモードの制御
+		const urlParams = new URLSearchParams(window.location.search);
+		const debugParam = urlParams.get('debug');
 		const isPC = isPCEnvironment();
-		console.log('isPCEnvironment結果:', isPC);
 		
-		if (isPC) {
-			addDebugLog('info', 'アプリケーション開始 - PC環境を検出');
+		// デバッグモードの判定ロジック
+		const shouldEnableDebug = debugParam === 'true' || (isPC && debugParam !== 'false');
+		
+		if (shouldEnableDebug) {
+			debugMode.set(true);
+			addDebugLog('info', `デバッグモード有効 - PC: ${isPC}, URL: ${debugParam}`);
+			console.log('onMount実行開始');
+			console.log('isPCEnvironment結果:', isPC);
+		} else {
+			debugMode.set(false);
+			console.log('デバッグモード無効 - スマホ環境またはURL指定');
 		}
-		
-		// 強制的にデバッグモードを有効化（テスト用）
-		debugMode.set(true);
-		addDebugLog('info', 'デバッグモードを強制有効化');
 
 		// マスターデータを読み込み
 		try {

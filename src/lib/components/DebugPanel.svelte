@@ -1,387 +1,274 @@
+<!-- DebugPanel.svelte - デバッグ情報表示パネル -->
 <script lang="ts">
-	import { debugMode, addDebugLog } from '$lib/stores/debug.js';
-	import { mockSwingPresets } from '$lib/sensors/mock-motion-generator.js';
-	import type MotionDetector from '$lib/sensors/motion-detector.js';
-	import { onMount } from 'svelte';
-
-	export let motionDetector: MotionDetector | null = null;
-	export let onMockSwingGenerated: ((swingData: any) => void) | null = null;
-	
-	onMount(() => {
-		console.log('DebugPanel mounted');
-		console.log('motionDetector:', motionDetector);
-		console.log('debugMode:', $debugMode);
-	});
-
-	let selectedPreset: keyof typeof mockSwingPresets = 'intermediate';
-
-	function toggleDebugMode() {
-		debugMode.update((current: boolean) => !current);
-		if (motionDetector) {
-			motionDetector.setDebugMode(!motionDetector.getDebugMode());
-		}
-		addDebugLog('info', `デバッグモード${$debugMode ? '有効' : '無効'}に切り替え`);
-	}
-
-	function generateMockSwing() {
-		console.log('generateMockSwing called');
-		console.log('motionDetector:', motionDetector);
-		console.log('selectedPreset:', selectedPreset);
-		
-		if (!motionDetector) {
-			console.error('MotionDetectorが初期化されていません');
-			addDebugLog('error', 'MotionDetectorが初期化されていません');
-			return;
-		}
-
-		try {
-			const swingData = motionDetector.generateMockSwing(selectedPreset);
-			console.log('Generated swing data:', swingData);
-			addDebugLog('info', `モックスイング生成: ${selectedPreset}`);
-			
-			if (onMockSwingGenerated) {
-				onMockSwingGenerated(swingData);
-			}
-		} catch (error) {
-			console.error('モックスイング生成エラー:', error);
-			addDebugLog('error', 'モックスイング生成エラー', error);
-		}
-	}
-
-	function testErrorLogging() {
-		addDebugLog('info', 'テスト情報ログ');
-		addDebugLog('warn', 'テスト警告ログ');
-		addDebugLog('error', 'テストエラーログ', { testData: 'サンプルデータ' });
-	}
-
-	function simulatePermissionError() {
-		addDebugLog('error', 'センサー権限エラーをシミュレート', {
-			error: 'NotAllowedError',
-			message: 'User denied permission'
-		});
-	}
-
-	function simulateSwingDetection() {
-		if (!motionDetector) return;
-		
-		addDebugLog('info', 'スイング検出シミュレーション開始');
-		
-		// 複数のセンサー読み取り値をシミュレート
-		for (let i = 0; i < 5; i++) {
-			setTimeout(() => {
-				addDebugLog('info', `スイングデータ取得`, {
-					gyro: { x: Math.random() * 20, y: Math.random() * 20, z: Math.random() * 20 },
-					accel: { x: Math.random() * 10, y: Math.random() * 10, z: Math.random() * 10 },
-					timestamp: Date.now()
-				});
-			}, i * 100);
-		}
-		
-		setTimeout(() => {
-			addDebugLog('info', 'スイング検出完了');
-		}, 600);
-	}
+  import { debugMode, debugLogs, getDebugInfo, addDebugLog } from '$lib/stores/debug.js';
+  import { onMount } from 'svelte';
+  
+  let isExpanded = false;
+  let debugInfo: any = null;
+  
+  onMount(() => {
+    debugInfo = getDebugInfo();
+    addDebugLog('info', 'DebugPanel初期化完了');
+  });
+  
+  function toggleExpanded() {
+    isExpanded = !isExpanded;
+  }
+  
+  function clearLogs() {
+    debugLogs.set([]);
+    addDebugLog('info', 'デバッグログをクリアしました');
+  }
+  
+  function copyDebugInfo() {
+    if (debugInfo) {
+      navigator.clipboard.writeText(JSON.stringify(debugInfo, null, 2));
+      addDebugLog('info', 'デバッグ情報をクリップボードにコピーしました');
+    }
+  }
 </script>
 
-<div class="debug-panel">
-	<div class="debug-panel-header">
-		<h3>🛠️ デバッグパネル</h3>
-		<label class="debug-toggle-switch">
-			<input 
-				type="checkbox" 
-				bind:checked={$debugMode}
-				on:change={toggleDebugMode}
-			>
-			<span class="slider"></span>
-			デバッグモード
-		</label>
-	</div>
-
-	{#if $debugMode}
-		<div class="debug-panel-content">
-			<!-- モックスイング生成 -->
-			<div class="debug-section">
-				<h4>📊 モックデータ生成</h4>
-				<div class="debug-form-group">
-					<label for="preset-select">スイングプリセット:</label>
-					<select id="preset-select" bind:value={selectedPreset}>
-						{#each Object.entries(mockSwingPresets) as [key, preset]}
-							<option value={key}>
-								{key} ({preset.swingPattern}, {preset.duration}ms)
-							</option>
-						{/each}
-					</select>
-				</div>
-				<button class="debug-btn debug-btn--primary" on:click={generateMockSwing}>
-					🎯 モックスイング生成
-				</button>
-			</div>
-
-			<!-- デバッグテスト -->
-			<div class="debug-section">
-				<h4>🧪 デバッグテスト</h4>
-				<div class="debug-btn-group">
-					<button class="debug-btn debug-btn--secondary" on:click={testErrorLogging}>
-						📝 ログテスト
-					</button>
-					<button class="debug-btn debug-btn--warning" on:click={simulatePermissionError}>
-						⚠️ 権限エラー
-					</button>
-					<button class="debug-btn debug-btn--info" on:click={simulateSwingDetection}>
-						🏌️ スイング検出
-					</button>
-				</div>
-			</div>
-
-			<!-- システム情報 -->
-			<div class="debug-section">
-				<h4>ℹ️ システム情報</h4>
-				<div class="debug-info">
-					<div class="debug-info-item">
-						<span class="label">User Agent:</span>
-						<span class="value">{navigator.userAgent.substring(0, 50)}...</span>
-					</div>
-					<div class="debug-info-item">
-						<span class="label">DeviceMotionEvent:</span>
-						<span class="value">{typeof DeviceMotionEvent !== 'undefined' ? '✅ サポート' : '❌ 未サポート'}</span>
-					</div>
-					<div class="debug-info-item">
-						<span class="label">画面サイズ:</span>
-						<span class="value">{window.innerWidth} × {window.innerHeight}</span>
-					</div>
-					{#if motionDetector}
-						<div class="debug-info-item">
-							<span class="label">記録中:</span>
-							<span class="value">{motionDetector.getIsRecording() ? '🔴 記録中' : '⚫ 停止中'}</span>
-						</div>
-						<div class="debug-info-item">
-							<span class="label">データ数:</span>
-							<span class="value">{motionDetector.getReadingsCount()} 件</span>
-						</div>
-					{/if}
-				</div>
-			</div>
-		</div>
-	{:else}
-		<div class="debug-panel-collapsed">
-			<p>デバッグモードを有効にすると詳細情報が表示されます</p>
-		</div>
-	{/if}
-</div>
+{#if $debugMode}
+  <div class="debug-panel">
+    <div class="debug-header" on:click={toggleExpanded}>
+      <span class="debug-title">🔧 Debug Panel</span>
+      <span class="toggle-icon">{isExpanded ? '▼' : '▶'}</span>
+    </div>
+    
+    {#if isExpanded}
+      <div class="debug-content">
+        <!-- デバッグ情報サマリー -->
+        <div class="debug-section">
+          <h4>📱 環境情報</h4>
+          {#if debugInfo}
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">環境:</span>
+                <span class="value">{debugInfo.isPCEnvironment ? 'PC' : 'Mobile'}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">画面:</span>
+                <span class="value">{debugInfo.screenInfo.width}×{debugInfo.screenInfo.height}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">DeviceMotion:</span>
+                <span class="value">{debugInfo.supportInfo.deviceMotion ? '✅' : '❌'}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Permission:</span>
+                <span class="value">{debugInfo.supportInfo.requestPermission ? '要求必要' : '不要'}</span>
+              </div>
+            </div>
+          {/if}
+        </div>
+        
+        <!-- アクションボタン -->
+        <div class="debug-actions">
+          <button class="debug-btn" on:click={clearLogs}>
+            🗑️ ログクリア
+          </button>
+          <button class="debug-btn" on:click={copyDebugInfo}>
+            📋 情報コピー
+          </button>
+        </div>
+        
+        <!-- ログ表示 -->
+        <div class="debug-section">
+          <h4>📝 デバッグログ ({$debugLogs.length})</h4>
+          <div class="log-container">
+            {#each $debugLogs.slice(0, 10) as log}
+              <div class="log-entry log-{log.level}">
+                <span class="log-time">{log.timestamp.toLocaleTimeString()}</span>
+                <span class="log-level">[{log.level.toUpperCase()}]</span>
+                <span class="log-message">{log.message}</span>
+                {#if log.data}
+                  <details class="log-data">
+                    <summary>詳細</summary>
+                    <pre>{JSON.stringify(log.data, null, 2)}</pre>
+                  </details>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <style>
-	.debug-panel {
-		background: white;
-		border: 1px solid #e5e7eb;
-		border-radius: 8px;
-		margin: 16px 0;
-		overflow: hidden;
-		font-family: 'Courier New', monospace;
-		font-size: 13px;
-	}
-
-	.debug-panel-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 12px 16px;
-		background: #f9fafb;
-		border-bottom: 1px solid #e5e7eb;
-	}
-
-	.debug-panel-header h3 {
-		margin: 0;
-		color: #374151;
-		font-size: 14px;
-		font-weight: bold;
-	}
-
-	.debug-toggle-switch {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		cursor: pointer;
-		font-size: 12px;
-		color: #6b7280;
-	}
-
-	.debug-toggle-switch input {
-		position: relative;
-		width: 40px;
-		height: 20px;
-		appearance: none;
-		background: #d1d5db;
-		border-radius: 10px;
-		transition: background 0.3s;
-	}
-
-	.debug-toggle-switch input:checked {
-		background: #3b82f6;
-	}
-
-	.debug-toggle-switch input::before {
-		content: '';
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		width: 16px;
-		height: 16px;
-		background: white;
-		border-radius: 50%;
-		transition: left 0.3s;
-	}
-
-	.debug-toggle-switch input:checked::before {
-		left: 22px;
-	}
-
-	.debug-panel-content {
-		padding: 16px;
-	}
-
-	.debug-panel-collapsed {
-		padding: 16px;
-		text-align: center;
-		color: #6b7280;
-	}
-
-	.debug-section {
-		margin-bottom: 24px;
-		padding-bottom: 16px;
-		border-bottom: 1px solid #f3f4f6;
-	}
-
-	.debug-section:last-child {
-		margin-bottom: 0;
-		border-bottom: none;
-	}
-
-	.debug-section h4 {
-		margin: 0 0 12px 0;
-		color: #374151;
-		font-size: 13px;
-		font-weight: bold;
-	}
-
-	.debug-form-group {
-		margin-bottom: 12px;
-	}
-
-	.debug-form-group label {
-		display: block;
-		margin-bottom: 4px;
-		color: #6b7280;
-		font-size: 12px;
-	}
-
-	.debug-form-group select {
-		width: 100%;
-		padding: 6px 8px;
-		border: 1px solid #d1d5db;
-		border-radius: 4px;
-		font-size: 12px;
-		font-family: inherit;
-	}
-
-	.debug-btn {
-		padding: 6px 12px;
-		border: 1px solid #d1d5db;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 11px;
-		font-family: inherit;
-		transition: all 0.2s;
-		background: white;
-	}
-
-	.debug-btn:hover {
-		background: #f9fafb;
-	}
-
-	.debug-btn--primary {
-		background: #3b82f6;
-		color: white;
-		border-color: #3b82f6;
-	}
-
-	.debug-btn--primary:hover {
-		background: #2563eb;
-	}
-
-	.debug-btn--secondary {
-		background: #6b7280;
-		color: white;
-		border-color: #6b7280;
-	}
-
-	.debug-btn--warning {
-		background: #f59e0b;
-		color: white;
-		border-color: #f59e0b;
-	}
-
-	.debug-btn--info {
-		background: #06b6d4;
-		color: white;
-		border-color: #06b6d4;
-	}
-
-	.debug-btn-group {
-		display: flex;
-		gap: 8px;
-		flex-wrap: wrap;
-	}
-
-	.debug-info {
-		background: #f9fafb;
-		padding: 12px;
-		border-radius: 4px;
-		border: 1px solid #f3f4f6;
-	}
-
-	.debug-info-item {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 6px;
-		font-size: 11px;
-	}
-
-	.debug-info-item:last-child {
-		margin-bottom: 0;
-	}
-
-	.debug-info-item .label {
-		color: #6b7280;
-		font-weight: bold;
-	}
-
-	.debug-info-item .value {
-		color: #374151;
-		text-align: right;
-		max-width: 60%;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	@media (max-width: 640px) {
-		.debug-panel-header {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 8px;
-		}
-
-		.debug-btn-group {
-			flex-direction: column;
-		}
-
-		.debug-info-item {
-			flex-direction: column;
-			gap: 2px;
-		}
-
-		.debug-info-item .value {
-			max-width: 100%;
-			text-align: left;
-		}
-	}
+  .debug-panel {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    max-width: 400px;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .debug-header {
+    padding: 8px 12px;
+    background: #1a1a1a;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+    user-select: none;
+  }
+  
+  .debug-header:hover {
+    background: #2a2a2a;
+  }
+  
+  .debug-title {
+    font-weight: bold;
+  }
+  
+  .toggle-icon {
+    color: #888;
+    transition: transform 0.2s;
+  }
+  
+  .debug-content {
+    padding: 12px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .debug-section {
+    margin-bottom: 16px;
+  }
+  
+  .debug-section h4 {
+    margin: 0 0 8px 0;
+    color: #ffff00;
+    font-size: 14px;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .label {
+    color: #888;
+  }
+  
+  .value {
+    color: #00ff00;
+    font-weight: bold;
+  }
+  
+  .debug-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .debug-btn {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10px;
+  }
+  
+  .debug-btn:hover {
+    background: #444;
+  }
+  
+  .log-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333;
+    border-radius: 4px;
+  }
+  
+  .log-entry {
+    padding: 4px 8px;
+    border-bottom: 1px solid #222;
+    word-wrap: break-word;
+  }
+  
+  .log-entry:last-child {
+    border-bottom: none;
+  }
+  
+  .log-info {
+    background: rgba(0, 255, 0, 0.1);
+  }
+  
+  .log-warn {
+    background: rgba(255, 255, 0, 0.1);
+    color: #ffff00;
+  }
+  
+  .log-error {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff6666;
+  }
+  
+  .log-time {
+    color: #888;
+    font-size: 10px;
+  }
+  
+  .log-level {
+    color: #fff;
+    font-weight: bold;
+    margin: 0 4px;
+  }
+  
+  .log-message {
+    color: inherit;
+  }
+  
+  .log-data {
+    margin-top: 4px;
+  }
+  
+  .log-data summary {
+    cursor: pointer;
+    color: #888;
+    font-size: 10px;
+  }
+  
+  .log-data pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    overflow-x: auto;
+    margin: 4px 0 0 0;
+  }
+  
+  /* モバイル対応 */
+  @media (max-width: 600px) {
+    .debug-panel {
+      max-width: calc(100vw - 20px);
+      font-size: 11px;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
