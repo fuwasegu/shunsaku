@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { GeminiClient } from '$lib/api/gemini.js';
 import type { SwingData, SwingAnalysis } from '$lib/api/gemini.js';
-import { GEMINI_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { PUBLIC_GEMINI_MODEL } from '$env/static/public';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -18,13 +18,15 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     // Gemini APIキーが設定されているかチェック
-    if (!GEMINI_API_KEY) {
+    const apiKey = env.GEMINI_API_KEY;
+    if (!apiKey) {
       console.warn('GEMINI_API_KEY not configured, using fallback analysis');
       return json(getFallbackAnalysis(swingData));
     }
 
     // Gemini クライアントを作成
-    const geminiClient = new GeminiClient(GEMINI_API_KEY, PUBLIC_GEMINI_MODEL);
+    const model = PUBLIC_GEMINI_MODEL || 'gemini-2.5-flash-lite';
+    const geminiClient = new GeminiClient(apiKey, model);
     
     // スイング解析を実行
     const analysis = await geminiClient.analyzeSwing(swingData);

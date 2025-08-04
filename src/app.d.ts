@@ -7,6 +7,12 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
+		interface PrivateEnv {
+			GEMINI_API_KEY?: string;
+		}
+		interface PublicEnv {
+			PUBLIC_GEMINI_MODEL?: string;
+		}
 	}
 }
 
