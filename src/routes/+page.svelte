@@ -158,9 +158,9 @@
 				throw new Error(`API error: ${response.status}`);
 			}
 
-			swingAnalysis = await response.json();
-			recommendations = generateRecommendations(data);
-			currentState = 'results';
+					swingAnalysis = await response.json();
+		recommendations = await generateRecommendations(data, swingAnalysis);
+		currentState = 'results';
 		} catch (error) {
 			console.error('Analysis error:', error);
 			
@@ -178,8 +178,8 @@
 				]
 			};
 
-			recommendations = generateRecommendations(data);
-			currentState = 'results';
+					recommendations = await generateRecommendations(data, swingAnalysis);
+		currentState = 'results';
 		}
 	}
 

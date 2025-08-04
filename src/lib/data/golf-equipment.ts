@@ -260,34 +260,100 @@ export const shafts: Shaft[] = [
   }
 ];
 
-// スイングタイプ別の推奨組み合わせ生成関数
-export function generateRecommendations(swingData: any): Combination[] {
-  // 実際にはAI解析結果に基づいて組み合わせを選択
-  // ここではダミーとして3つの組み合わせを返す
-  return [
-    {
-      id: 'combo-001',
-      head: clubHeads[0],
-      shaft: shafts[1],
-      reason: 'あなたの手首の使い方に最適な組み合わせです',
-      expectedEffect: '飛距離アップと方向性の向上',
-      compatibility: 9
-    },
-    {
-      id: 'combo-002', 
-      head: clubHeads[2],
-      shaft: shafts[3],
-      reason: 'スイングの軌道を安定させる組み合わせ',
-      expectedEffect: 'ミート率向上とブレ軽減',
-      compatibility: 8
-    },
-    {
-      id: 'combo-003',
-      head: clubHeads[4],
-      shaft: shafts[0],
-      reason: 'あなたのタイミングに合わせた設計',
-      expectedEffect: '打感向上と一貫性アップ',
-      compatibility: 7
-    }
-  ];
+import { golfDB } from '$lib/database/pglite.js';
+import type { SwingData, SwingAnalysis } from '$lib/api/gemini.js';
+
+// スイングデータからプロファイルを作成する関数
+function createSwingProfile(swingData: SwingData, analysis?: SwingAnalysis) {
+  // ジャイロデータから特徴を抽出
+  const maxGyro = Math.max(
+    ...swingData.gyroscope.x.map(Math.abs),
+    ...swingData.gyroscope.y.map(Math.abs),
+    ...swingData.gyroscope.z.map(Math.abs)
+  );
+
+  const maxAccel = Math.max(
+    ...swingData.accelerometer.x.map(Math.abs),
+    ...swingData.accelerometer.y.map(Math.abs),
+    ...swingData.accelerometer.z.map(Math.abs)
+  );
+
+  // パワーレベル計算（1-10）
+  const powerLevel = Math.min(10, Math.max(1, Math.floor(maxGyro / 3)));
+  
+  // 一貫性計算（1-10）
+  const gyroVariation = calculateVariation(swingData.gyroscope.x);
+  const consistency = Math.min(10, Math.max(1, 10 - Math.floor(gyroVariation / 2)));
+  
+  // テンポ判定
+  let tempo: 'fast' | 'medium' | 'slow' = 'medium';
+  if (swingData.duration < 1000) tempo = 'fast';
+  else if (swingData.duration > 2000) tempo = 'slow';
+  
+  // スイングタイプ判定
+  let swingType: 'aggressive' | 'smooth' | 'balanced' = 'balanced';
+  if (maxGyro > 25) swingType = 'aggressive';
+  else if (maxGyro < 8) swingType = 'smooth';
+
+  // スムーズネス計算
+  const avgAccel = swingData.accelerometer.x.reduce((a, b) => a + b, 0) / swingData.accelerometer.x.length;
+  const variance = swingData.accelerometer.x.reduce((sum, acc) => sum + Math.pow(acc - avgAccel, 2), 0) / swingData.accelerometer.x.length;
+  const smoothness = Math.max(0, 100 - Math.sqrt(variance));
+
+  return {
+    power_level: powerLevel,
+    consistency: consistency,
+    tempo: tempo,
+    swing_type: swingType,
+    max_acceleration: maxAccel,
+    max_rotation_rate: maxGyro,
+    swing_duration: swingData.duration,
+    smoothness: smoothness
+  };
+}
+
+function calculateVariation(data: number[]): number {
+  const mean = data.reduce((a, b) => a + b, 0) / data.length;
+  const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length;
+  return Math.sqrt(variance);
+}
+
+// PGliteを使った推奨組み合わせ生成関数
+export async function generateRecommendations(swingData: SwingData, analysis?: SwingAnalysis): Promise<Combination[]> {
+  try {
+    // データベースを初期化
+    await golfDB.initialize();
+    
+    // スイングプロファイルを作成
+    const profileData = createSwingProfile(swingData, analysis);
+    const profileId = await golfDB.createSwingProfile(profileData);
+    
+    // PGliteから推奨組み合わせを取得
+    const recommendations = await golfDB.getRecommendations(profileId, 3);
+    
+    // 既存のCombination型に変換
+    return recommendations.map(rec => ({
+      id: rec.id,
+      head: rec.head,
+      shaft: rec.shaft,
+      reason: rec.reason,
+      expectedEffect: rec.expected_effect,
+      compatibility: rec.compatibility_score
+    }));
+    
+  } catch (error) {
+    console.error('❌ Failed to generate recommendations:', error);
+    
+    // フォールバック: 従来のロジック
+    return [
+      {
+        id: 'combo-fallback-001',
+        head: clubHeads[0],
+        shaft: shafts[1],
+        reason: 'システムエラーのため基本的な組み合わせを表示しています',
+        expectedEffect: '安定したパフォーマンス',
+        compatibility: 7
+      }
+    ];
+  }
 }
