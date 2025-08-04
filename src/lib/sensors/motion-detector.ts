@@ -46,17 +46,29 @@ export class MotionDetector {
 
   async requestPermission(): Promise<boolean> {
     try {
+      console.log('Checking device motion support...');
+      
+      // 基本的なサポート確認
+      if (typeof DeviceMotionEvent === 'undefined') {
+        console.log('DeviceMotionEvent not supported');
+        return false;
+      }
+
       // iOS 13+ では明示的な権限要求が必要
-      if (typeof DeviceMotionEvent !== 'undefined' && 
-          'requestPermission' in DeviceMotionEvent) {
+      if ('requestPermission' in DeviceMotionEvent && 
+          typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+        console.log('Requesting permission on iOS...');
         const permission = await (DeviceMotionEvent as any).requestPermission();
+        console.log('Permission result:', permission);
         return permission === 'granted';
       }
       
-      // Android では自動的に利用可能
-      return typeof DeviceMotionEvent !== 'undefined';
+      // Android や古いiOSでは自動的に利用可能
+      console.log('Permission not required on this device');
+      return true;
     } catch (error) {
       console.error('Permission request failed:', error);
+      this.onErrorCallback?.(`権限要求エラー: ${error}`);
       return false;
     }
   }

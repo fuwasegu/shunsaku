@@ -55,6 +55,27 @@
 		});
 	});
 
+	async function requestSensorPermission() {
+		try {
+			console.log('Requesting sensor permission...');
+			const permissionGranted = await motionDetector.requestPermission();
+			
+			if (permissionGranted) {
+				console.log('Permission granted');
+				hasPermission = true;
+				// 権限が得られたら即座に測定開始
+				startMeasurement();
+			} else {
+				errorMessage = 'センサーの使用許可が必要です。設定から許可してください';
+				currentState = 'error';
+			}
+		} catch (error) {
+			console.error('Permission request error:', error);
+			errorMessage = 'センサー権限の取得に失敗しました';
+			currentState = 'error';
+		}
+	}
+
 	async function startMeasurement() {
 		try {
 			// センサーサポート確認
@@ -64,13 +85,9 @@
 				return;
 			}
 
-			// 権限要求
-			currentState = 'permission';
-			const hasPermission = await motionDetector.requestPermission();
-			
-			if (!hasPermission) {
-				errorMessage = 'センサーの使用許可が必要です。設定から許可してください';
-				currentState = 'error';
+			// 権限確認（ただし要求はしない）
+			if (hasPermission === false) {
+				currentState = 'permission';
 				return;
 			}
 
@@ -240,9 +257,12 @@
 					<span>📱</span>
 				</div>
 				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">センサーアクセス許可</h2>
-				<p class="mock-text-gray-600">
+				<p class="mock-text-gray-600 mock-mb-4">
 					スイング解析にはデバイスのモーションセンサーへのアクセスが必要です
 				</p>
+				<button class="mock-btn mock-btn--primary mock-w-full" on:click={requestSensorPermission}>
+					許可する
+				</button>
 			</div>
 		</section>
 
