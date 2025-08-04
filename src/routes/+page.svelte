@@ -338,10 +338,8 @@
 		<!-- 解析中 -->
 		<section class="mock-text-center mock-mb-8">
 			<div class="mock-card--outlined">
-				<div class="mock-animate-pulse">
-					<div class="icon-circle">
-						<span class="mock-animate-spin">🔄</span>
-					</div>
+				<div class="icon-circle">
+					<span>🤖</span>
 				</div>
 				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">AI解析中...</h2>
 				<p class="mock-text-gray-600">
