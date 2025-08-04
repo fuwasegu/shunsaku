@@ -16,8 +16,8 @@
 	import { debugMode, addDebugLog, isPCEnvironment } from '$lib/stores/debug.js';
 
 	// アプリの状態管理
-	type AppState = 'ready' | 'permission' | 'measuring' | 'analyzing' | 'results' | 'error';
-	let currentState: AppState = 'ready';
+	type AppState = 'loading' | 'ready' | 'permission' | 'measuring' | 'analyzing' | 'results' | 'error';
+	let currentState: AppState = 'loading';
 	let errorMessage = '';
 	let progressValue = 0;
 	let motionDetector: MotionDetector;
@@ -27,6 +27,7 @@
 	let swingVisualizer: SwingVisualizer;
 	let hasPermission: boolean | null = null;
 	let countdown = 0;
+	let loadingMessage = 'アプリケーションを初期化中...';
 
 	onMount(async () => {
 		// デバッグモードの制御
@@ -49,12 +50,29 @@
 
 		// マスターデータを読み込み
 		try {
+			loadingMessage = 'データベースを初期化中...';
 			await loadMasterData();
+			
+			loadingMessage = 'データを検証中...';
 			await verifyData();
+			
+			loadingMessage = '完了！';
 			addDebugLog('info', 'マスターデータの読み込み完了');
+			
+			// 少し待ってからメイン画面へ
+			setTimeout(() => {
+				currentState = 'ready';
+			}, 500);
+			
 		} catch (error) {
 			console.error('マスターデータの読み込みに失敗しました:', error);
 			addDebugLog('error', 'マスターデータの読み込みに失敗', { error });
+			loadingMessage = 'データ読み込みに失敗しました';
+			
+			// エラーでも3秒後にready状態に移行（フォールバック）
+			setTimeout(() => {
+				currentState = 'ready';
+			}, 3000);
 		}
 
 		motionDetector = new MotionDetector({
@@ -301,7 +319,21 @@
 			/>
 		{/if}
 
-	{#if currentState === 'ready'}
+	{#if currentState === 'loading'}
+		<!-- 初期化画面 -->
+		<section class="mock-text-center mock-mb-8">
+			<div class="mock-card">
+				<div class="icon-circle">
+					<span class="mock-animate-spin">⚙️</span>
+				</div>
+				<h2 class="mock-text-xl mock-text-gray-900 mock-mb-4">初期化中...</h2>
+				<p class="mock-text-sm mock-text-gray-600 mock-mb-4">{loadingMessage}</p>
+				<div class="mock-progress">
+					<div class="mock-progress-bar loading-progress"></div>
+				</div>
+			</div>
+		</section>
+	{:else if currentState === 'ready'}
 		<!-- 開始画面 -->
 		<section class="mock-text-center mock-mb-8">
 			<div class="mock-card">
