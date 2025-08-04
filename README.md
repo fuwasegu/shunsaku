@@ -3,4 +3,3 @@
 ## デザインシステムデモ
 
 /internal/design-demo にアクセス
-
