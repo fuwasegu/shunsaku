@@ -119,41 +119,21 @@
 		scene.add(labelMesh);
 	}
 
-	function addAxisTrailLabel(axis: string, position: THREE.Vector3) {
-		const axisInfo = {
-			x: { color: 0xff0000, text: 'X軸\n左右' },
-			y: { color: 0x00ff00, text: 'Y軸\n上下' },
-			z: { color: 0x0000ff, text: 'Z軸\n前後' }
-		};
-
-		// 超大きな軸名マーカー
-		const markerGeometry = new THREE.SphereGeometry(1.0); // 0.4から1.0に拡大
+	function addSimpleAxisLabel(axis: string, label: string, position: THREE.Vector3, color: number) {
+		// シンプルで見やすいラベルマーカー
+		const markerGeometry = new THREE.SphereGeometry(0.6);
 		const markerMaterial = new THREE.MeshPhongMaterial({ 
-			color: axisInfo[axis as keyof typeof axisInfo].color,
-			emissive: axisInfo[axis as keyof typeof axisInfo].color,
-			emissiveIntensity: 0.7 // 発光を強化
+			color: color,
+			emissive: color,
+			emissiveIntensity: 0.6
 		});
 		const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-		marker.userData.isAxisRelated = true; // 削除用マーク
-		marker.position.set(
-			position.x,
-			position.y + 4, // 高い位置に配置
-			position.z
-		);
+		marker.userData.isAxisRelated = true;
+		
+		// 軸の端から少し離れた位置に配置
+		const offset = new THREE.Vector3().copy(position).normalize().multiplyScalar(2);
+		marker.position.copy(position).add(offset);
 		scene.add(marker);
-
-		// 追加の黒いアウトラインマーカー
-		const outlineGeometry = new THREE.SphereGeometry(1.1);
-		const outlineMaterial = new THREE.MeshPhongMaterial({ 
-			color: 0x000000,
-			transparent: true,
-			opacity: 0.6
-		});
-		const outlineMarker = new THREE.Mesh(outlineGeometry, outlineMaterial);
-		outlineMarker.userData.isAxisRelated = true; // 削除用マーク
-		outlineMarker.position.copy(marker.position);
-		outlineMarker.position.z -= 0.1;
-		scene.add(outlineMarker);
 	}
 
 	async function initThreeJS() {
@@ -312,110 +292,89 @@
 	}
 
 	function createAxisTrails() {
-		console.log('createAxisTrails開始');
+		console.log('シンプルな軸表示を作成開始');
 		// axisTrailsオブジェクトを初期化
 		axisTrails = {} as any;
 
-		// 各軸の動きを個別に可視化（超目立つ色）
-		const axisColors = {
-			x: 0xff0000, // 鮮やかな赤 - 左右
-			y: 0x00ff00, // 鮮やかな緑 - 上下  
-			z: 0x0000ff  // 鮮やかな青 - 前後
-		};
+		// シンプルで分かりやすい太い直線軸を作成
+		const axisLength = 15;
+		const axisThickness = 0.15;
 		
-		// 太い黒線も追加で表示
-		const thickBlackColors = {
-			x: 0x000000, // 黒
-			y: 0x000000, // 黒
-			z: 0x000000  // 黒
-		};
+		const axisConfigs = [
+			{ 
+				axis: 'x', 
+				color: 0xff0000, 
+				start: new THREE.Vector3(-axisLength, 0, 0),
+				end: new THREE.Vector3(axisLength, 0, 0),
+				label: 'X軸（左右）'
+			},
+			{ 
+				axis: 'y', 
+				color: 0x00ff00, 
+				start: new THREE.Vector3(0, -axisLength, 0),
+				end: new THREE.Vector3(0, axisLength, 0),
+				label: 'Y軸（上下）'
+			},
+			{ 
+				axis: 'z', 
+				color: 0x0000ff, 
+				start: new THREE.Vector3(0, 0, -axisLength),
+				end: new THREE.Vector3(0, 0, axisLength),
+				label: 'Z軸（前後）'
+			}
+		];
 
-		// 軸別の軌道ポイントを計算
-		const axisPoints = {
-			x: [] as THREE.Vector3[],
-			y: [] as THREE.Vector3[],
-			z: [] as THREE.Vector3[]
-		};
-
-		for (let i = 0; i < swingData.gyroscope.x.length; i++) {
-			const t = i / swingData.gyroscope.x.length;
-			const gyroX = swingData.gyroscope.x[i]; // ピッチ（上下回転）
-			const gyroY = swingData.gyroscope.y[i]; // ヨー（左右回転）
-			const gyroZ = swingData.gyroscope.z[i]; // ロール（前後回転）
-
-			// X軸の影響のみを表示（左右の動き - ヨー回転）
-			const xOnly = new THREE.Vector3(
-				gyroY * 0.15, // ヨー回転（左右の動き）
-				t * 4 - 2, // 時間軸を少し拡大
-				0
-			);
-			axisPoints.x.push(xOnly);
-
-			// Y軸の影響のみを表示（上下の動き - ピッチ回転）
-			const yOnly = new THREE.Vector3(
-				0,
-				gyroX * 0.15, // ピッチ回転（上下の動き）
-				t * 4 - 2 // 時間軸を少し拡大
-			);
-			axisPoints.y.push(yOnly);
-
-			// Z軸の影響のみを表示（前後の動き - ロール回転）
-			const zOnly = new THREE.Vector3(
-				t * 4 - 2, // 時間軸を少し拡大
-				0,
-				gyroZ * 0.15 // ロール回転（前後の動き）
-			);
-			axisPoints.z.push(zOnly);
-		}
-
-		// 各軸の軌道ラインを作成（超太くて見やすい線）
-		Object.keys(axisPoints).forEach((axis) => {
-			const points = axisPoints[axis as keyof typeof axisPoints];
+		axisConfigs.forEach(config => {
+			// 太いシリンダーで軸を作成
+			const direction = new THREE.Vector3().subVectors(config.end, config.start);
+			const length = direction.length();
 			
-			// TubeGeometryで実際に太い3D線を作成
-			const curve = new THREE.CatmullRomCurve3(points);
-			const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.2, 8, false);
-			
-			// 鮮やかな色のマテリアル
-			const coloredMaterial = new THREE.MeshPhongMaterial({ 
-				color: axisColors[axis as keyof typeof axisColors],
+			const geometry = new THREE.CylinderGeometry(axisThickness, axisThickness, length, 16);
+			const material = new THREE.MeshPhongMaterial({ 
+				color: config.color,
 				transparent: true,
-				opacity: highlightedAxis === 'none' || highlightedAxis === axis ? 0.9 : 0.4,
-				emissive: axisColors[axis as keyof typeof axisColors],
+				opacity: highlightedAxis === 'none' || highlightedAxis === config.axis ? 0.9 : 0.4,
+				emissive: config.color,
 				emissiveIntensity: 0.3
 			});
 			
-			const coloredTube = new THREE.Mesh(tubeGeometry, coloredMaterial);
-			coloredTube.userData.isAxisRelated = true; // 削除用マーク
+			const cylinder = new THREE.Mesh(geometry, material);
+			cylinder.userData.isAxisRelated = true;
 			
-			// 軸別軌道の配置を明確に分ける
-			coloredTube.position.set(
-				axis === 'x' ? -12 : axis === 'y' ? 0 : 12,  // X軸: 左、Y軸: 中央、Z軸: 右
-				axis === 'y' ? 8 : -3,                        // Y軸: 上、X・Z軸: 下
-				axis === 'z' ? -8 : 0                         // Z軸: 後ろ
-			);
+			// 軸の向きを設定
+			const normalizedDirection = direction.normalize();
+			const quaternion = new THREE.Quaternion();
+			quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normalizedDirection);
+			cylinder.setRotationFromQuaternion(quaternion);
 			
-			axisTrails[axis as keyof typeof axisTrails] = coloredTube;
-			scene.add(coloredTube);
+			// 軸の中心位置を設定
+			const center = new THREE.Vector3().addVectors(config.start, config.end).multiplyScalar(0.5);
+			cylinder.position.copy(center);
 			
-			// さらに太い黒線のアウトラインも追加
-			const blackTubeGeometry = new THREE.TubeGeometry(curve, 64, 0.25, 8, false);
-			const blackMaterial = new THREE.MeshPhongMaterial({ 
-				color: 0x000000,
-				transparent: true,
-				opacity: 0.6
+			axisTrails[config.axis as keyof typeof axisTrails] = cylinder;
+			scene.add(cylinder);
+			
+			// 軸の両端に矢印（コーン）を追加
+			const arrowGeometry = new THREE.ConeGeometry(axisThickness * 2, axisThickness * 4, 8);
+			const arrowMaterial = new THREE.MeshPhongMaterial({ 
+				color: config.color,
+				emissive: config.color,
+				emissiveIntensity: 0.5
 			});
-			const blackTube = new THREE.Mesh(blackTubeGeometry, blackMaterial);
-			blackTube.userData.isAxisRelated = true; // 削除用マーク
-			blackTube.position.copy(coloredTube.position);
-			blackTube.position.z -= 0.1; // 少し後ろに配置してアウトライン効果
-			scene.add(blackTube);
 			
-			// 軸ラベルを追加
-			addAxisTrailLabel(axis, coloredTube.position);
-			console.log(`${axis}軸の太い軌道を作成しました`);
+			const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+			arrow.userData.isAxisRelated = true;
+			arrow.position.copy(config.end);
+			arrow.setRotationFromQuaternion(quaternion);
+			scene.add(arrow);
+			
+			// ラベルマーカーを追加
+			addSimpleAxisLabel(config.axis, config.label, config.end, config.color);
+			
+			console.log(`${config.label}を作成しました`);
 		});
-		console.log('createAxisTrails完了', axisTrails);
+		
+		console.log('シンプル軸表示完了', axisTrails);
 	}
 
 	function addGolfClub(startPosition: THREE.Vector3) {
@@ -571,19 +530,19 @@
 				};
 				
 				if (highlightedAxis === 'none' || highlightedAxis === axis) {
-					// ハイライト表示：明るく、発光効果強化
-					material.opacity = 0.95;
+					// ハイライト表示：明るく、太く
+					material.opacity = 0.9;
 					material.color.setHex(originalColors[axis as keyof typeof originalColors]);
 					material.emissive.setHex(originalColors[axis as keyof typeof originalColors]);
-					material.emissiveIntensity = 0.5;
-					trail.scale.setScalar(1.2); // 少し大きく表示
+					material.emissiveIntensity = 0.4;
+					trail.scale.setScalar(1.5); // 太く表示
 				} else {
-					// 非ハイライト表示：薄く、発光効果削減
+					// 非ハイライト表示：薄く、細く
 					material.opacity = 0.3;
-					material.color.setHex(0x666666); // グレーアウト
-					material.emissive.setHex(0x333333);
+					material.color.setHex(0x888888); // グレーアウト
+					material.emissive.setHex(0x444444);
 					material.emissiveIntensity = 0.1;
-					trail.scale.setScalar(0.8); // 少し小さく表示
+					trail.scale.setScalar(0.7); // 細く表示
 				}
 				material.needsUpdate = true;
 			}
@@ -712,23 +671,23 @@
 		
 		{#if showAxisTrails}
 			<div class="legend-section">
-				<h5 class="legend-title">🎯 軸別表示</h5>
+				<h5 class="legend-title">🎯 シンプル軸表示</h5>
 				<div class="legend-items">
 					<div class="legend-item">
 						<div class="axis-marker axis-marker--x"></div>
-						<span><strong>左側の赤線</strong>: X軸（左右の動き）</span>
+						<span><strong>赤い直線</strong>: X軸（左右の動き）</span>
 					</div>
 					<div class="legend-item">
 						<div class="axis-marker axis-marker--y"></div>
-						<span><strong>上側の緑線</strong>: Y軸（上下の動き）</span>
+						<span><strong>緑の直線</strong>: Y軸（上下の動き）</span>
 					</div>
 					<div class="legend-item">
 						<div class="axis-marker axis-marker--z"></div>
-						<span><strong>右側の青線</strong>: Z軸（前後の動き）</span>
+						<span><strong>青い直線</strong>: Z軸（前後の動き）</span>
 					</div>
 					<div class="legend-item">
-						<span class="legend-icon">💡</span>
-						<span>各軸上に光る球体がマーカー表示</span>
+						<span class="legend-icon">🏹</span>
+						<span>矢印付きで方向が明確</span>
 					</div>
 				</div>
 			</div>
