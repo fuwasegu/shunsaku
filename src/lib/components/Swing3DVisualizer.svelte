@@ -6,6 +6,8 @@
 	export let swingData: SwingData;
 	export let autoRotate = true;
 	export let showGrid = true;
+	export let showAxisTrails = true;
+	export let highlightedAxis: 'none' | 'x' | 'y' | 'z' = 'none';
 
 	let container: HTMLDivElement;
 	let scene: THREE.Scene;
@@ -16,6 +18,13 @@
 	let swingLine: THREE.Line;
 	let impactMarker: THREE.Mesh;
 	let controls: any; // OrbitControls（型定義なしで使用）
+	
+	// 軸別軌道表示用
+	let axisTrails: {
+		x: THREE.Line;
+		y: THREE.Line;
+		z: THREE.Line;
+	};
 
 	// アニメーション関連
 	let isAnimating = false;
@@ -215,6 +224,11 @@
 		swingLine = new THREE.Line(geometry, material);
 		scene.add(swingLine);
 
+		// 軸別軌道の作成
+		if (showAxisTrails) {
+			createAxisTrails();
+		}
+
 		// インパクトポイントのマーカー
 		const impactIndex = findImpactPoint();
 		const impactPoint = curvePoints[Math.floor(impactIndex * curvePoints.length)];
@@ -252,6 +266,75 @@
 		);
 		const maxIndex = gyroMagnitudes.indexOf(Math.max(...gyroMagnitudes));
 		return maxIndex / gyroMagnitudes.length;
+	}
+
+	function createAxisTrails() {
+		// 各軸の動きを個別に可視化
+		const axisColors = {
+			x: 0xff0000, // 赤 - 左右
+			y: 0x00ff00, // 緑 - 上下  
+			z: 0x0000ff  // 青 - 前後
+		};
+
+		// 軸別の軌道ポイントを計算
+		const axisPoints = {
+			x: [] as THREE.Vector3[],
+			y: [] as THREE.Vector3[],
+			z: [] as THREE.Vector3[]
+		};
+
+		for (let i = 0; i < swingData.gyroscope.x.length; i++) {
+			const t = i / swingData.gyroscope.x.length;
+			const gyroX = swingData.gyroscope.x[i];
+			const gyroY = swingData.gyroscope.y[i];
+			const gyroZ = swingData.gyroscope.z[i];
+
+			// X軸の影響のみを表示（左右の動き）
+			const xOnly = new THREE.Vector3(
+				gyroY * 0.1, // X軸の動きは主にgyroYに表れる
+				t * 3 - 1.5, // 時間軸
+				0
+			);
+			axisPoints.x.push(xOnly);
+
+			// Y軸の影響のみを表示（上下の動き）
+			const yOnly = new THREE.Vector3(
+				0,
+				Math.abs(gyroX) * 0.1, // Y軸の動きはgyroXに表れる
+				t * 3 - 1.5
+			);
+			axisPoints.y.push(yOnly);
+
+			// Z軸の影響のみを表示（前後の動き）
+			const zOnly = new THREE.Vector3(
+				t * 3 - 1.5,
+				0,
+				gyroZ * 0.1 // Z軸の動きはgyroZに表れる
+			);
+			axisPoints.z.push(zOnly);
+		}
+
+		// 各軸の軌道ラインを作成
+		Object.keys(axisPoints).forEach((axis) => {
+			const points = axisPoints[axis as keyof typeof axisPoints];
+			const geometry = new THREE.BufferGeometry().setFromPoints(points);
+			const material = new THREE.LineBasicMaterial({ 
+				color: axisColors[axis as keyof typeof axisColors],
+				linewidth: 3,
+				transparent: true,
+				opacity: highlightedAxis === 'none' || highlightedAxis === axis ? 0.8 : 0.3
+			});
+			
+			const line = new THREE.Line(geometry, material);
+			line.position.set(
+				axis === 'x' ? -8 : axis === 'y' ? 0 : 8,
+				axis === 'y' ? 8 : 0,
+				axis === 'z' ? -8 : 0
+			);
+			
+			axisTrails[axis as keyof typeof axisTrails] = line;
+			scene.add(line);
+		});
 	}
 
 	function addGolfClub(startPosition: THREE.Vector3) {
@@ -356,6 +439,25 @@
 		}
 	}
 
+	// 軸ハイライトの更新
+	$: if (axisTrails && highlightedAxis !== undefined) {
+		updateAxisHighlight();
+	}
+
+	function updateAxisHighlight() {
+		if (!axisTrails) return;
+		
+		Object.keys(axisTrails).forEach((axis) => {
+			const trail = axisTrails[axis as keyof typeof axisTrails];
+			if (trail && trail.material) {
+				(trail.material as THREE.LineBasicMaterial).opacity = 
+					highlightedAxis === 'none' || highlightedAxis === axis ? 0.9 : 0.2;
+				(trail.material as THREE.LineBasicMaterial).linewidth = 
+					highlightedAxis === axis ? 5 : 3;
+			}
+		});
+	}
+
 	$: if (swingData && scene) {
 		// データが更新された場合の再描画
 		scene.clear();
@@ -381,7 +483,44 @@
 			>
 				{autoRotate ? '🔄 自動回転ON' : '⏸️ 自動回転OFF'}
 			</button>
+			<button 
+				class="btn btn--small btn--outline"
+				on:click={() => showAxisTrails = !showAxisTrails}
+			>
+				{showAxisTrails ? '📊 軸表示ON' : '📊 軸表示OFF'}
+			</button>
 		</div>
+		
+		<!-- 軸選択コントロール -->
+		{#if showAxisTrails}
+			<div class="axis-controls">
+				<span class="axis-label">軸ハイライト:</span>
+				<button 
+					class="axis-btn {highlightedAxis === 'none' ? 'active' : ''}"
+					on:click={() => highlightedAxis = 'none'}
+				>
+					全て
+				</button>
+				<button 
+					class="axis-btn axis-btn--x {highlightedAxis === 'x' ? 'active' : ''}"
+					on:click={() => highlightedAxis = 'x'}
+				>
+					X軸（左右）
+				</button>
+				<button 
+					class="axis-btn axis-btn--y {highlightedAxis === 'y' ? 'active' : ''}"
+					on:click={() => highlightedAxis = 'y'}
+				>
+					Y軸（上下）
+				</button>
+				<button 
+					class="axis-btn axis-btn--z {highlightedAxis === 'z' ? 'active' : ''}"
+					on:click={() => highlightedAxis = 'z'}
+				>
+					Z軸（前後）
+				</button>
+			</div>
+		{/if}
 	</div>
 	
 	<div class="canvas-container" bind:this={container}></div>
@@ -422,6 +561,26 @@
 				</div>
 			</div>
 		</div>
+		
+		{#if showAxisTrails}
+			<div class="legend-section">
+				<h5 class="legend-title">🎯 軸別表示</h5>
+				<div class="legend-items">
+					<div class="legend-item">
+						<span class="legend-icon">📊</span>
+						<span>各軸の動きを個別に表示中</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-icon">🔄</span>
+						<span>軸ボタンで個別ハイライト可能</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-icon">⚡</span>
+						<span>選択した軸の動きが強調表示</span>
+					</div>
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>
 
@@ -584,9 +743,72 @@
 		box-shadow: 0 0 4px rgba(0, 0, 255, 0.3);
 	}
 
+	.legend-icon {
+		font-size: 1rem;
+		margin-right: 4px;
+	}
+
 	@keyframes pulse {
 		0%, 100% { transform: scale(1); opacity: 1; }
 		50% { transform: scale(1.2); opacity: 0.7; }
+	}
+
+	.axis-controls {
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		padding: 12px;
+		margin-top: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.axis-label {
+		color: white;
+		font-size: 0.9rem;
+		font-weight: 500;
+		margin-right: 8px;
+	}
+
+	.axis-btn {
+		padding: 6px 12px;
+		border-radius: 6px;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		font-size: 0.8rem;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.axis-btn:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.axis-btn.active {
+		background: rgba(255, 255, 255, 0.3);
+		border-color: rgba(255, 255, 255, 0.6);
+		font-weight: 600;
+	}
+
+	.axis-btn--x.active {
+		background: rgba(255, 68, 68, 0.3);
+		border-color: #ff4444;
+		color: #ffcccc;
+	}
+
+	.axis-btn--y.active {
+		background: rgba(68, 255, 68, 0.3);
+		border-color: #44ff44;
+		color: #ccffcc;
+	}
+
+	.axis-btn--z.active {
+		background: rgba(68, 68, 255, 0.3);
+		border-color: #4444ff;
+		color: #ccccff;
 	}
 
 	@media (max-width: 768px) {
@@ -612,6 +834,21 @@
 
 		.legend-item {
 			font-size: 0.8rem;
+		}
+
+		.axis-controls {
+			padding: 8px;
+			gap: 6px;
+		}
+
+		.axis-btn {
+			padding: 4px 8px;
+			font-size: 0.75rem;
+		}
+
+		.axis-label {
+			width: 100%;
+			margin-bottom: 6px;
 		}
 	}
 </style>
