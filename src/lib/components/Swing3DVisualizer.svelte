@@ -126,20 +126,34 @@
 			z: { color: 0x0000ff, text: 'Z軸\n前後' }
 		};
 
-		// 軸名を示すマーカー
-		const markerGeometry = new THREE.SphereGeometry(0.4);
+		// 超大きな軸名マーカー
+		const markerGeometry = new THREE.SphereGeometry(1.0); // 0.4から1.0に拡大
 		const markerMaterial = new THREE.MeshPhongMaterial({ 
 			color: axisInfo[axis as keyof typeof axisInfo].color,
 			emissive: axisInfo[axis as keyof typeof axisInfo].color,
-			emissiveIntensity: 0.5
+			emissiveIntensity: 0.7 // 発光を強化
 		});
 		const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+		marker.userData.isAxisRelated = true; // 削除用マーク
 		marker.position.set(
 			position.x,
-			position.y + 3,
+			position.y + 4, // 高い位置に配置
 			position.z
 		);
 		scene.add(marker);
+
+		// 追加の黒いアウトラインマーカー
+		const outlineGeometry = new THREE.SphereGeometry(1.1);
+		const outlineMaterial = new THREE.MeshPhongMaterial({ 
+			color: 0x000000,
+			transparent: true,
+			opacity: 0.6
+		});
+		const outlineMarker = new THREE.Mesh(outlineGeometry, outlineMaterial);
+		outlineMarker.userData.isAxisRelated = true; // 削除用マーク
+		outlineMarker.position.copy(marker.position);
+		outlineMarker.position.z -= 0.1;
+		scene.add(outlineMarker);
 	}
 
 	async function initThreeJS() {
@@ -302,11 +316,18 @@
 		// axisTrailsオブジェクトを初期化
 		axisTrails = {} as any;
 
-		// 各軸の動きを個別に可視化
+		// 各軸の動きを個別に可視化（超目立つ色）
 		const axisColors = {
-			x: 0xff0000, // 赤 - 左右
-			y: 0x00ff00, // 緑 - 上下  
-			z: 0x0000ff  // 青 - 前後
+			x: 0xff0000, // 鮮やかな赤 - 左右
+			y: 0x00ff00, // 鮮やかな緑 - 上下  
+			z: 0x0000ff  // 鮮やかな青 - 前後
+		};
+		
+		// 太い黒線も追加で表示
+		const thickBlackColors = {
+			x: 0x000000, // 黒
+			y: 0x000000, // 黒
+			z: 0x000000  // 黒
 		};
 
 		// 軸別の軌道ポイントを計算
@@ -347,31 +368,52 @@
 			axisPoints.z.push(zOnly);
 		}
 
-		// 各軸の軌道ラインを作成
+		// 各軸の軌道ラインを作成（超太くて見やすい線）
 		Object.keys(axisPoints).forEach((axis) => {
 			const points = axisPoints[axis as keyof typeof axisPoints];
-			const geometry = new THREE.BufferGeometry().setFromPoints(points);
-			const material = new THREE.LineBasicMaterial({ 
+			
+			// TubeGeometryで実際に太い3D線を作成
+			const curve = new THREE.CatmullRomCurve3(points);
+			const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.2, 8, false);
+			
+			// 鮮やかな色のマテリアル
+			const coloredMaterial = new THREE.MeshPhongMaterial({ 
 				color: axisColors[axis as keyof typeof axisColors],
-				linewidth: 3,
 				transparent: true,
-				opacity: highlightedAxis === 'none' || highlightedAxis === axis ? 0.8 : 0.3
+				opacity: highlightedAxis === 'none' || highlightedAxis === axis ? 0.9 : 0.4,
+				emissive: axisColors[axis as keyof typeof axisColors],
+				emissiveIntensity: 0.3
 			});
 			
-			const line = new THREE.Line(geometry, material);
+			const coloredTube = new THREE.Mesh(tubeGeometry, coloredMaterial);
+			coloredTube.userData.isAxisRelated = true; // 削除用マーク
+			
 			// 軸別軌道の配置を明確に分ける
-			line.position.set(
-				axis === 'x' ? -10 : axis === 'y' ? 0 : 10,  // X軸: 左、Y軸: 中央、Z軸: 右
-				axis === 'y' ? 6 : -2,                        // Y軸: 上、X・Z軸: 下
-				axis === 'z' ? -6 : 0                         // Z軸: 後ろ
+			coloredTube.position.set(
+				axis === 'x' ? -12 : axis === 'y' ? 0 : 12,  // X軸: 左、Y軸: 中央、Z軸: 右
+				axis === 'y' ? 8 : -3,                        // Y軸: 上、X・Z軸: 下
+				axis === 'z' ? -8 : 0                         // Z軸: 後ろ
 			);
 			
-			axisTrails[axis as keyof typeof axisTrails] = line;
-			scene.add(line);
+			axisTrails[axis as keyof typeof axisTrails] = coloredTube;
+			scene.add(coloredTube);
+			
+			// さらに太い黒線のアウトラインも追加
+			const blackTubeGeometry = new THREE.TubeGeometry(curve, 64, 0.25, 8, false);
+			const blackMaterial = new THREE.MeshPhongMaterial({ 
+				color: 0x000000,
+				transparent: true,
+				opacity: 0.6
+			});
+			const blackTube = new THREE.Mesh(blackTubeGeometry, blackMaterial);
+			blackTube.userData.isAxisRelated = true; // 削除用マーク
+			blackTube.position.copy(coloredTube.position);
+			blackTube.position.z -= 0.1; // 少し後ろに配置してアウトライン効果
+			scene.add(blackTube);
 			
 			// 軸ラベルを追加
-			addAxisTrailLabel(axis, line.position);
-			console.log(`${axis}軸の軌道を作成しました`);
+			addAxisTrailLabel(axis, coloredTube.position);
+			console.log(`${axis}軸の太い軌道を作成しました`);
 		});
 		console.log('createAxisTrails完了', axisTrails);
 	}
@@ -486,10 +528,22 @@
 				createAxisTrails();
 			} else if (!showAxisTrails && axisTrails) {
 				console.log('軸表示をOFFにします');
-				// 軸表示をOFFにする場合、軸ラインを削除
+				// 軸表示をOFFにする場合、すべての軸関連オブジェクトを削除
+				
+				// axisTrailsに格納されているオブジェクトを削除
 				Object.values(axisTrails).forEach(trail => {
 					if (trail) scene.remove(trail);
 				});
+				
+				// シーン内のすべてのオブジェクトをチェックして、軸関連を削除
+				const objectsToRemove: THREE.Object3D[] = [];
+				scene.traverse((object) => {
+					if (object.userData && object.userData.isAxisRelated) {
+						objectsToRemove.push(object);
+					}
+				});
+				objectsToRemove.forEach(obj => scene.remove(obj));
+				
 				axisTrails = null;
 			}
 		}
@@ -509,16 +563,27 @@
 		Object.keys(axisTrails).forEach((axis) => {
 			const trail = axisTrails![axis as keyof typeof axisTrails];
 			if (trail && trail.material) {
-				const material = trail.material as THREE.LineBasicMaterial;
+				const material = trail.material as THREE.MeshPhongMaterial;
+				const originalColors = {
+					x: 0xff0000,
+					y: 0x00ff00,  
+					z: 0x0000ff
+				};
+				
 				if (highlightedAxis === 'none' || highlightedAxis === axis) {
-					material.opacity = 0.9;
-					material.color.setHex(
-						axis === 'x' ? 0xff0000 : 
-						axis === 'y' ? 0x00ff00 : 0x0000ff
-					);
+					// ハイライト表示：明るく、発光効果強化
+					material.opacity = 0.95;
+					material.color.setHex(originalColors[axis as keyof typeof originalColors]);
+					material.emissive.setHex(originalColors[axis as keyof typeof originalColors]);
+					material.emissiveIntensity = 0.5;
+					trail.scale.setScalar(1.2); // 少し大きく表示
 				} else {
+					// 非ハイライト表示：薄く、発光効果削減
 					material.opacity = 0.3;
-					material.color.setHex(0x888888); // グレーアウト
+					material.color.setHex(0x666666); // グレーアウト
+					material.emissive.setHex(0x333333);
+					material.emissiveIntensity = 0.1;
+					trail.scale.setScalar(0.8); // 少し小さく表示
 				}
 				material.needsUpdate = true;
 			}
