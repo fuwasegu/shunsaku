@@ -116,6 +116,29 @@
 		scene.add(labelMesh);
 	}
 
+	function addAxisTrailLabel(axis: string, position: THREE.Vector3) {
+		const axisInfo = {
+			x: { color: 0xff0000, text: 'X軸\n左右' },
+			y: { color: 0x00ff00, text: 'Y軸\n上下' },
+			z: { color: 0x0000ff, text: 'Z軸\n前後' }
+		};
+
+		// 軸名を示すマーカー
+		const markerGeometry = new THREE.SphereGeometry(0.4);
+		const markerMaterial = new THREE.MeshPhongMaterial({ 
+			color: axisInfo[axis as keyof typeof axisInfo].color,
+			emissive: axisInfo[axis as keyof typeof axisInfo].color,
+			emissiveIntensity: 0.5
+		});
+		const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+		marker.position.set(
+			position.x,
+			position.y + 3,
+			position.z
+		);
+		scene.add(marker);
+	}
+
 	async function initThreeJS() {
 		// シーンの作成
 		scene = new THREE.Scene();
@@ -288,31 +311,31 @@
 
 		for (let i = 0; i < swingData.gyroscope.x.length; i++) {
 			const t = i / swingData.gyroscope.x.length;
-			const gyroX = swingData.gyroscope.x[i];
-			const gyroY = swingData.gyroscope.y[i];
-			const gyroZ = swingData.gyroscope.z[i];
+			const gyroX = swingData.gyroscope.x[i]; // ピッチ（上下回転）
+			const gyroY = swingData.gyroscope.y[i]; // ヨー（左右回転）
+			const gyroZ = swingData.gyroscope.z[i]; // ロール（前後回転）
 
-			// X軸の影響のみを表示（左右の動き）
+			// X軸の影響のみを表示（左右の動き - ヨー回転）
 			const xOnly = new THREE.Vector3(
-				gyroY * 0.1, // X軸の動きは主にgyroYに表れる
-				t * 3 - 1.5, // 時間軸
+				gyroY * 0.15, // ヨー回転（左右の動き）
+				t * 4 - 2, // 時間軸を少し拡大
 				0
 			);
 			axisPoints.x.push(xOnly);
 
-			// Y軸の影響のみを表示（上下の動き）
+			// Y軸の影響のみを表示（上下の動き - ピッチ回転）
 			const yOnly = new THREE.Vector3(
 				0,
-				Math.abs(gyroX) * 0.1, // Y軸の動きはgyroXに表れる
-				t * 3 - 1.5
+				gyroX * 0.15, // ピッチ回転（上下の動き）
+				t * 4 - 2 // 時間軸を少し拡大
 			);
 			axisPoints.y.push(yOnly);
 
-			// Z軸の影響のみを表示（前後の動き）
+			// Z軸の影響のみを表示（前後の動き - ロール回転）
 			const zOnly = new THREE.Vector3(
-				t * 3 - 1.5,
+				t * 4 - 2, // 時間軸を少し拡大
 				0,
-				gyroZ * 0.1 // Z軸の動きはgyroZに表れる
+				gyroZ * 0.15 // ロール回転（前後の動き）
 			);
 			axisPoints.z.push(zOnly);
 		}
@@ -329,14 +352,18 @@
 			});
 			
 			const line = new THREE.Line(geometry, material);
+			// 軸別軌道の配置を明確に分ける
 			line.position.set(
-				axis === 'x' ? -8 : axis === 'y' ? 0 : 8,
-				axis === 'y' ? 8 : 0,
-				axis === 'z' ? -8 : 0
+				axis === 'x' ? -10 : axis === 'y' ? 0 : 10,  // X軸: 左、Y軸: 中央、Z軸: 右
+				axis === 'y' ? 6 : -2,                        // Y軸: 上、X・Z軸: 下
+				axis === 'z' ? -6 : 0                         // Z軸: 後ろ
 			);
 			
 			axisTrails[axis as keyof typeof axisTrails] = line;
 			scene.add(line);
+			
+			// 軸ラベルを追加
+			addAxisTrailLabel(axis, line.position);
 		});
 	}
 
@@ -584,16 +611,20 @@
 				<h5 class="legend-title">🎯 軸別表示</h5>
 				<div class="legend-items">
 					<div class="legend-item">
-						<span class="legend-icon">📊</span>
-						<span>各軸の動きを個別に表示中</span>
+						<div class="axis-marker axis-marker--x"></div>
+						<span><strong>左側の赤線</strong>: X軸（左右の動き）</span>
 					</div>
 					<div class="legend-item">
-						<span class="legend-icon">🔄</span>
-						<span>軸ボタンで個別ハイライト可能</span>
+						<div class="axis-marker axis-marker--y"></div>
+						<span><strong>上側の緑線</strong>: Y軸（上下の動き）</span>
 					</div>
 					<div class="legend-item">
-						<span class="legend-icon">⚡</span>
-						<span>選択した軸の動きが強調表示</span>
+						<div class="axis-marker axis-marker--z"></div>
+						<span><strong>右側の青線</strong>: Z軸（前後の動き）</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-icon">💡</span>
+						<span>各軸上に光る球体がマーカー表示</span>
 					</div>
 				</div>
 			</div>
