@@ -26,6 +26,25 @@
 	let impactFrame = 0;
 	let smoothnessScore = 0;
 	let peakVelocity = 0;
+	
+	// ゴルファー向け詳細フェーズ
+	let detailedPhases = {
+		address: 0,           // アドレス（構え）
+		takeaway: 0,         // テークアウェイ開始
+		backswingTop: 0,     // バックスイングトップ
+		downswingStart: 0,   // ダウンスイング開始
+		impact: 0,           // インパクト
+		followStart: 0,      // フォロースルー開始
+		finish: 0            // フィニッシュ
+	};
+	
+	// スイングテンポ分析
+	let tempoAnalysis = {
+		backswingTime: 0,
+		downswingTime: 0,
+		ratio: 0,
+		ideal: false
+	};
 
 	onMount(() => {
 		if (swingData) {
@@ -51,32 +70,143 @@
 		impactFrame = gyroMagnitudes.indexOf(Math.max(...gyroMagnitudes));
 		peakVelocity = Math.max(...gyroMagnitudes);
 
-		// スイングフェーズを分析
+		// 詳細なスイングフェーズ分析
+		analyzeDetailedPhases(gyroMagnitudes);
+		
+		// スイングテンポ分析
+		analyzeSwingTempo();
+
+		// 従来のスイングフェーズを分析（後方互換性のため）
 		const totalFrames = gyroMagnitudes.length;
-		const thresholdStart = Math.max(...gyroMagnitudes) * 0.3;
-
-		// バックスイング: 開始から最大値まで
-		let backswingEnd = impactFrame;
-		swingPhases.backswing = (backswingEnd / totalFrames) * 100;
-
-		// ダウンスイング: 最大値から値が半分になるまで
-		let downswingEnd = impactFrame;
-		for (let i = impactFrame + 1; i < gyroMagnitudes.length; i++) {
-			if (gyroMagnitudes[i] < peakVelocity * 0.5) {
-				downswingEnd = i;
-				break;
-			}
-		}
-		swingPhases.downswing = ((downswingEnd - impactFrame) / totalFrames) * 100;
-
-		// フォロースルー: 残り
-		swingPhases.followthrough = ((totalFrames - downswingEnd) / totalFrames) * 100;
+		swingPhases.backswing = (detailedPhases.backswingTop / totalFrames) * 100;
+		swingPhases.downswing = ((detailedPhases.impact - detailedPhases.downswingStart) / totalFrames) * 100;
+		swingPhases.followthrough = ((totalFrames - detailedPhases.impact) / totalFrames) * 100;
 
 		// スイングの滑らかさ（標準偏差の逆数）
 		const mean = gyroMagnitudes.reduce((a, b) => a + b) / gyroMagnitudes.length;
 		const variance = gyroMagnitudes.reduce((sum, val) => sum + (val - mean) ** 2, 0) / gyroMagnitudes.length;
 		const stdDev = Math.sqrt(variance);
 		smoothnessScore = Math.max(0, 10 - stdDev);
+	}
+
+	function analyzeDetailedPhases(gyroMagnitudes: number[]) {
+		const totalFrames = gyroMagnitudes.length;
+		const threshold = Math.max(...gyroMagnitudes) * 0.1;
+		
+		// 1. アドレス（静止状態から動き始める点）
+		detailedPhases.address = 0;
+		
+		// 2. テークアウェイ開始（動きが閾値を超えた点）
+		for (let i = 1; i < totalFrames; i++) {
+			if (gyroMagnitudes[i] > threshold) {
+				detailedPhases.takeaway = i;
+				break;
+			}
+		}
+		
+		// 3. バックスイングトップ（角速度が一時的に減少する点）
+		let maxBackswingPoint = 0;
+		let maxBackswingValue = 0;
+		for (let i = detailedPhases.takeaway; i < impactFrame; i++) {
+			// 移動平均で滑らかにして判定
+			const avgCurrent = (gyroMagnitudes[i] + (gyroMagnitudes[i-1] || 0) + (gyroMagnitudes[i+1] || 0)) / 3;
+			if (avgCurrent > maxBackswingValue) {
+				maxBackswingValue = avgCurrent;
+				maxBackswingPoint = i;
+			}
+		}
+		detailedPhases.backswingTop = maxBackswingPoint;
+		
+		// 4. ダウンスイング開始（バックスイングトップから加速が始まる点）
+		detailedPhases.downswingStart = detailedPhases.backswingTop;
+		
+		// 5. インパクト（最大角速度の点）
+		detailedPhases.impact = impactFrame;
+		
+		// 6. フォロースルー開始（インパクト後）
+		detailedPhases.followStart = impactFrame + 1;
+		
+		// 7. フィニッシュ（角速度が閾値以下に戻る点）
+		detailedPhases.finish = totalFrames - 1;
+		for (let i = impactFrame + 1; i < totalFrames; i++) {
+			if (gyroMagnitudes[i] < threshold) {
+				detailedPhases.finish = i;
+				break;
+			}
+		}
+	}
+
+	function analyzeSwingTempo() {
+		const timestamps = swingData.timestamp;
+		
+		// バックスイング時間（テークアウェイ〜トップ）
+		tempoAnalysis.backswingTime = timestamps[detailedPhases.backswingTop] - timestamps[detailedPhases.takeaway];
+		
+		// ダウンスイング時間（トップ〜インパクト）
+		tempoAnalysis.downswingTime = timestamps[detailedPhases.impact] - timestamps[detailedPhases.backswingTop];
+		
+		// 理想的な比率は3:1（バックスイング:ダウンスイング）
+		tempoAnalysis.ratio = tempoAnalysis.backswingTime / tempoAnalysis.downswingTime;
+		tempoAnalysis.ideal = tempoAnalysis.ratio >= 2.5 && tempoAnalysis.ratio <= 3.5;
+	}
+
+	// Chart.jsプラグイン：スイングフェーズの補助線
+	function createPhaseLinePlugin() {
+		return {
+			id: 'swingPhaseLines',
+			afterDraw: (chart: any) => {
+				const ctx = chart.ctx;
+				const chartArea = chart.chartArea;
+				
+				// フェーズ定義
+				const phases = [
+					{ frame: detailedPhases.takeaway, label: '🏌️ テークアウェイ', color: '#10b981' },
+					{ frame: detailedPhases.backswingTop, label: '⬆️ トップ', color: '#3b82f6' },
+					{ frame: detailedPhases.impact, label: '⚡ インパクト', color: '#ef4444' },
+					{ frame: detailedPhases.finish, label: '🏁 フィニッシュ', color: '#8b5cf6' }
+				];
+				
+				phases.forEach(phase => {
+					const timestamp = swingData.timestamp[phase.frame];
+					const x = chart.scales.x.getPixelForValue(timestamp);
+					
+					// 縦線を描画
+					ctx.save();
+					ctx.strokeStyle = phase.color;
+					ctx.lineWidth = 2;
+					ctx.setLineDash([5, 5]);
+					ctx.beginPath();
+					ctx.moveTo(x, chartArea.top);
+					ctx.lineTo(x, chartArea.bottom);
+					ctx.stroke();
+					
+					// ラベルを描画
+					ctx.fillStyle = phase.color;
+					ctx.font = '12px sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText(phase.label, x, chartArea.top - 10);
+					ctx.restore();
+				});
+				
+				// フェーズ間の背景色
+				ctx.save();
+				const phaseColors = [
+					{ start: 0, end: detailedPhases.takeaway, color: 'rgba(156, 163, 175, 0.1)', label: 'アドレス' },
+					{ start: detailedPhases.takeaway, end: detailedPhases.backswingTop, color: 'rgba(16, 185, 129, 0.1)', label: 'バックスイング' },
+					{ start: detailedPhases.backswingTop, end: detailedPhases.impact, color: 'rgba(59, 130, 246, 0.1)', label: 'ダウンスイング' },
+					{ start: detailedPhases.impact, end: detailedPhases.finish, color: 'rgba(139, 92, 246, 0.1)', label: 'フォロー' }
+				];
+				
+				phaseColors.forEach(phase => {
+					const startX = chart.scales.x.getPixelForValue(swingData.timestamp[phase.start]);
+					const endX = chart.scales.x.getPixelForValue(swingData.timestamp[phase.end]);
+					
+					ctx.fillStyle = phase.color;
+					ctx.fillRect(startX, chartArea.top, endX - startX, chartArea.bottom - chartArea.top);
+				});
+				ctx.restore();
+			}
+		};
 	}
 
 	function createCharts() {
@@ -134,7 +264,7 @@
 				plugins: {
 					title: {
 						display: true,
-						text: '🌪️ 角速度データ（ジャイロスコープ）',
+						text: '🌪️ 角速度データ（スイングフェーズ付き）',
 						font: { size: 16, weight: 'bold' as const }
 					},
 					legend: {
@@ -155,7 +285,8 @@
 						}
 					}
 				}
-			}
+			},
+			plugins: [createPhaseLinePlugin()]
 		});
 	}
 
@@ -511,29 +642,96 @@
 			<canvas bind:this={analysisCanvas} width="300" height="250"></canvas>
 		</div>
 
-		<!-- スイング分析詳細 -->
-		<div class="analysis-details">
-			<h4 class="analysis-title">📊 詳細分析</h4>
-			<div class="analysis-list">
-				<div class="analysis-item">
-					<span class="analysis-icon">🎯</span>
-					<span class="analysis-text">インパクトタイミング: {((impactFrame / swingData.gyroscope.x.length) * 100).toFixed(1)}%</span>
+		<!-- ゴルファー向け分析詳細 -->
+		<div class="golf-analysis">
+			<h4 class="analysis-title">⛳ ゴルファー向け分析</h4>
+			
+			<!-- スイングテンポ分析 -->
+			<div class="tempo-analysis">
+				<h5 class="tempo-title">
+					⏱️ スイングテンポ
+					<span class="tempo-status {tempoAnalysis.ideal ? 'ideal' : 'needs-work'}">
+						{tempoAnalysis.ideal ? '理想的' : '要調整'}
+					</span>
+				</h5>
+				<div class="tempo-details">
+					<div class="tempo-item">
+						<span class="tempo-label">バックスイング時間:</span>
+						<span class="tempo-value">{(tempoAnalysis.backswingTime / 1000).toFixed(2)}秒</span>
+					</div>
+					<div class="tempo-item">
+						<span class="tempo-label">ダウンスイング時間:</span>
+						<span class="tempo-value">{(tempoAnalysis.downswingTime / 1000).toFixed(2)}秒</span>
+					</div>
+					<div class="tempo-item">
+						<span class="tempo-label">テンポ比率:</span>
+						<span class="tempo-value">{tempoAnalysis.ratio.toFixed(1)}:1</span>
+						<span class="tempo-advice">
+							{#if tempoAnalysis.ratio < 2.5}
+								（もう少しゆっくりバックスイングを）
+							{:else if tempoAnalysis.ratio > 3.5}
+								（ダウンスイングをもう少し素早く）
+							{:else}
+								（理想的なテンポです！）
+							{/if}
+						</span>
+					</div>
 				</div>
-				<div class="analysis-item">
-					<span class="analysis-icon">⚡</span>
-					<span class="analysis-text">ピーク角速度: {peakVelocity.toFixed(1)} deg/s</span>
+			</div>
+
+			<!-- フェーズ別分析 -->
+			<div class="phase-analysis">
+				<h5 class="phase-title">🎯 フェーズ別アドバイス</h5>
+				<div class="phase-grid">
+					<div class="phase-card">
+						<div class="phase-name">🏌️ テークアウェイ</div>
+						<div class="phase-time">{swingData.timestamp[detailedPhases.takeaway]}ms</div>
+						<div class="phase-advice">ゆっくり始動</div>
+					</div>
+					<div class="phase-card">
+						<div class="phase-name">⬆️ トップ</div>
+						<div class="phase-time">{swingData.timestamp[detailedPhases.backswingTop]}ms</div>
+						<div class="phase-advice">一瞬の溜め</div>
+					</div>
+					<div class="phase-card impact">
+						<div class="phase-name">⚡ インパクト</div>
+						<div class="phase-time">{swingData.timestamp[detailedPhases.impact]}ms</div>
+						<div class="phase-advice">最重要ポイント</div>
+					</div>
+					<div class="phase-card">
+						<div class="phase-name">🏁 フィニッシュ</div>
+						<div class="phase-time">{swingData.timestamp[detailedPhases.finish]}ms</div>
+						<div class="phase-advice">大きく振り抜く</div>
+					</div>
 				</div>
-				<div class="analysis-item">
-					<span class="analysis-icon">⏰</span>
-					<span class="analysis-text">バックスイング: {swingPhases.backswing.toFixed(1)}%</span>
-				</div>
-				<div class="analysis-item">
-					<span class="analysis-icon">🎯</span>
-					<span class="analysis-text">ダウンスイング: {swingPhases.downswing.toFixed(1)}%</span>
-				</div>
-				<div class="analysis-item">
-					<span class="analysis-icon">🌊</span>
-					<span class="analysis-text">スムーズネス: {smoothnessScore > 7 ? '良好' : smoothnessScore > 5 ? '普通' : '要改善'}</span>
+			</div>
+
+			<!-- 改善ポイント -->
+			<div class="improvement-tips">
+				<h5 class="tips-title">💡 次回の改善ポイント</h5>
+				<div class="tips-list">
+					{#if !tempoAnalysis.ideal}
+						<div class="tip-item">
+							<span class="tip-icon">⏰</span>
+							<span class="tip-text">
+								スイングテンポを調整しましょう（理想は3:1）
+							</span>
+						</div>
+					{/if}
+					{#if smoothnessScore < 7}
+						<div class="tip-item">
+							<span class="tip-icon">🌊</span>
+							<span class="tip-text">
+								より滑らかなスイングを心がけましょう
+							</span>
+						</div>
+					{/if}
+					<div class="tip-item">
+						<span class="tip-icon">🎯</span>
+						<span class="tip-text">
+							インパクト時の角速度: {peakVelocity.toFixed(1)} deg/s
+						</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -648,6 +846,172 @@
 		font-weight: 500;
 	}
 
+	/* ゴルファー向け分析スタイル */
+	.golf-analysis {
+		background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+		border-radius: 12px;
+		padding: 24px;
+		border: 2px solid #22c55e;
+		grid-column: span 2;
+	}
+
+	.tempo-analysis {
+		margin-bottom: 24px;
+		padding: 16px;
+		background: white;
+		border-radius: 8px;
+		border-left: 4px solid #3b82f6;
+	}
+
+	.tempo-title {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-bottom: 12px;
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: #1e40af;
+	}
+
+	.tempo-status {
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 0.8rem;
+		font-weight: 600;
+	}
+
+	.tempo-status.ideal {
+		background: #dcfce7;
+		color: #166534;
+	}
+
+	.tempo-status.needs-work {
+		background: #fed7aa;
+		color: #9a3412;
+	}
+
+	.tempo-details {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.tempo-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.9rem;
+	}
+
+	.tempo-label {
+		font-weight: 500;
+		color: #374151;
+		min-width: 140px;
+	}
+
+	.tempo-value {
+		font-weight: 700;
+		color: #1e40af;
+	}
+
+	.tempo-advice {
+		font-size: 0.8rem;
+		color: #6b7280;
+		font-style: italic;
+	}
+
+	.phase-analysis {
+		margin-bottom: 24px;
+	}
+
+	.phase-title {
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: #1e40af;
+		margin-bottom: 16px;
+	}
+
+	.phase-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 12px;
+	}
+
+	.phase-card {
+		background: white;
+		border-radius: 8px;
+		padding: 12px;
+		text-align: center;
+		border: 2px solid #e5e7eb;
+		transition: all 0.2s;
+	}
+
+	.phase-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.phase-card.impact {
+		border-color: #ef4444;
+		background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+	}
+
+	.phase-name {
+		font-weight: 600;
+		color: #374151;
+		margin-bottom: 4px;
+	}
+
+	.phase-time {
+		font-size: 0.8rem;
+		color: #6b7280;
+		margin-bottom: 4px;
+	}
+
+	.phase-advice {
+		font-size: 0.75rem;
+		color: #059669;
+		font-weight: 500;
+	}
+
+	.improvement-tips {
+		padding: 16px;
+		background: white;
+		border-radius: 8px;
+		border-left: 4px solid #f59e0b;
+	}
+
+	.tips-title {
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: #92400e;
+		margin-bottom: 12px;
+	}
+
+	.tips-list {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.tip-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px;
+		background: #fffbeb;
+		border-radius: 6px;
+	}
+
+	.tip-icon {
+		font-size: 1.1rem;
+	}
+
+	.tip-text {
+		font-size: 0.9rem;
+		color: #92400e;
+	}
+
 	@media (max-width: 768px) {
 		.chart-container {
 			height: 240px;
@@ -659,6 +1023,29 @@
 
 		.analytics-container {
 			padding: 16px;
+		}
+
+		.golf-analysis {
+			grid-column: span 1;
+			padding: 16px;
+		}
+
+		.phase-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.tempo-details {
+			gap: 6px;
+		}
+
+		.tempo-item {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 4px;
+		}
+
+		.tempo-label {
+			min-width: auto;
 		}
 	}
 </style>
