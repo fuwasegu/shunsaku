@@ -24,7 +24,7 @@
 		x: THREE.Line;
 		y: THREE.Line;
 		z: THREE.Line;
-	};
+	} | null = null;
 
 	// アニメーション関連
 	let isAnimating = false;
@@ -269,6 +269,9 @@
 	}
 
 	function createAxisTrails() {
+		// axisTrailsオブジェクトを初期化
+		axisTrails = {} as any;
+
 		// 各軸の動きを個別に可視化
 		const axisColors = {
 			x: 0xff0000, // 赤 - 左右
@@ -440,7 +443,7 @@
 	}
 
 	// 軸ハイライトの更新
-	$: if (axisTrails && highlightedAxis !== undefined) {
+	$: if (axisTrails && showAxisTrails && highlightedAxis !== undefined) {
 		updateAxisHighlight();
 	}
 
@@ -448,7 +451,7 @@
 		if (!axisTrails) return;
 		
 		Object.keys(axisTrails).forEach((axis) => {
-			const trail = axisTrails[axis as keyof typeof axisTrails];
+			const trail = axisTrails![axis as keyof typeof axisTrails];
 			if (trail && trail.material) {
 				(trail.material as THREE.LineBasicMaterial).opacity = 
 					highlightedAxis === 'none' || highlightedAxis === axis ? 0.9 : 0.2;
@@ -458,9 +461,23 @@
 		});
 	}
 
+	// showAxisTrailsの変更時に軸表示を更新
+	$: if (scene && swingData) {
+		if (showAxisTrails && !axisTrails) {
+			createAxisTrails();
+		} else if (!showAxisTrails && axisTrails) {
+			// 軸表示をOFFにする場合、軸ラインを削除
+			Object.values(axisTrails).forEach(trail => {
+				if (trail) scene.remove(trail);
+			});
+			axisTrails = null;
+		}
+	}
+
 	$: if (swingData && scene) {
 		// データが更新された場合の再描画
 		scene.clear();
+		axisTrails = null; // axisTrailsをリセット
 		createSwing3D();
 	}
 </script>
