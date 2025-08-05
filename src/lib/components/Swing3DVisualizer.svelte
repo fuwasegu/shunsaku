@@ -6,8 +6,11 @@
 	export let swingData: SwingData;
 	export let autoRotate = true;
 	export let showGrid = true;
-	export let showAxisTrails = true;
+	export let showAxisTrails = true; // デフォルトでON
 	export let highlightedAxis: 'none' | 'x' | 'y' | 'z' = 'none';
+	
+	// デバッグ用の状態確認
+	$: console.log('State:', { showAxisTrails, highlightedAxis, axisTrails: !!axisTrails });
 
 	let container: HTMLDivElement;
 	let scene: THREE.Scene;
@@ -247,9 +250,12 @@
 		swingLine = new THREE.Line(geometry, material);
 		scene.add(swingLine);
 
-		// 軸別軌道の作成
+		// 軸別軌道の作成（デフォルトでON）
 		if (showAxisTrails) {
+			console.log('createSwing3D内で軸表示を作成');
 			createAxisTrails();
+		} else {
+			console.log('createSwing3D内で軸表示をスキップ');
 		}
 
 		// インパクトポイントのマーカー
@@ -292,6 +298,7 @@
 	}
 
 	function createAxisTrails() {
+		console.log('createAxisTrails開始');
 		// axisTrailsオブジェクトを初期化
 		axisTrails = {} as any;
 
@@ -364,7 +371,9 @@
 			
 			// 軸ラベルを追加
 			addAxisTrailLabel(axis, line.position);
+			console.log(`${axis}軸の軌道を作成しました`);
 		});
+		console.log('createAxisTrails完了', axisTrails);
 	}
 
 	function addGolfClub(startPosition: THREE.Vector3) {
@@ -469,9 +478,29 @@
 		}
 	}
 
+	// showAxisTrailsの変更を監視
+	$: {
+		if (scene && swingData) {
+			if (showAxisTrails && !axisTrails) {
+				console.log('軸表示をONにします');
+				createAxisTrails();
+			} else if (!showAxisTrails && axisTrails) {
+				console.log('軸表示をOFFにします');
+				// 軸表示をOFFにする場合、軸ラインを削除
+				Object.values(axisTrails).forEach(trail => {
+					if (trail) scene.remove(trail);
+				});
+				axisTrails = null;
+			}
+		}
+	}
+
 	// 軸ハイライトの更新
-	$: if (axisTrails && showAxisTrails && highlightedAxis !== undefined) {
-		updateAxisHighlight();
+	$: {
+		if (axisTrails && showAxisTrails) {
+			console.log('ハイライト更新:', highlightedAxis);
+			updateAxisHighlight();
+		}
 	}
 
 	function updateAxisHighlight() {
@@ -480,25 +509,20 @@
 		Object.keys(axisTrails).forEach((axis) => {
 			const trail = axisTrails![axis as keyof typeof axisTrails];
 			if (trail && trail.material) {
-				(trail.material as THREE.LineBasicMaterial).opacity = 
-					highlightedAxis === 'none' || highlightedAxis === axis ? 0.9 : 0.2;
-				(trail.material as THREE.LineBasicMaterial).linewidth = 
-					highlightedAxis === axis ? 5 : 3;
+				const material = trail.material as THREE.LineBasicMaterial;
+				if (highlightedAxis === 'none' || highlightedAxis === axis) {
+					material.opacity = 0.9;
+					material.color.setHex(
+						axis === 'x' ? 0xff0000 : 
+						axis === 'y' ? 0x00ff00 : 0x0000ff
+					);
+				} else {
+					material.opacity = 0.3;
+					material.color.setHex(0x888888); // グレーアウト
+				}
+				material.needsUpdate = true;
 			}
 		});
-	}
-
-	// showAxisTrailsの変更時に軸表示を更新
-	$: if (scene && swingData) {
-		if (showAxisTrails && !axisTrails) {
-			createAxisTrails();
-		} else if (!showAxisTrails && axisTrails) {
-			// 軸表示をOFFにする場合、軸ラインを削除
-			Object.values(axisTrails).forEach(trail => {
-				if (trail) scene.remove(trail);
-			});
-			axisTrails = null;
-		}
 	}
 
 	$: if (swingData && scene) {
@@ -529,7 +553,10 @@
 			</button>
 			<button 
 				class="btn btn--small btn--outline"
-				on:click={() => showAxisTrails = !showAxisTrails}
+				on:click={() => {
+					console.log('軸表示ボタンクリック:', showAxisTrails, '->', !showAxisTrails);
+					showAxisTrails = !showAxisTrails;
+				}}
 			>
 				{showAxisTrails ? '📊 軸表示ON' : '📊 軸表示OFF'}
 			</button>
@@ -541,25 +568,37 @@
 				<span class="axis-label">軸ハイライト:</span>
 				<button 
 					class="axis-btn {highlightedAxis === 'none' ? 'active' : ''}"
-					on:click={() => highlightedAxis = 'none'}
+					on:click={() => {
+						console.log('全て ボタンクリック');
+						highlightedAxis = 'none';
+					}}
 				>
 					全て
 				</button>
 				<button 
 					class="axis-btn axis-btn--x {highlightedAxis === 'x' ? 'active' : ''}"
-					on:click={() => highlightedAxis = 'x'}
+					on:click={() => {
+						console.log('X軸 ボタンクリック');
+						highlightedAxis = 'x';
+					}}
 				>
 					X軸（左右）
 				</button>
 				<button 
 					class="axis-btn axis-btn--y {highlightedAxis === 'y' ? 'active' : ''}"
-					on:click={() => highlightedAxis = 'y'}
+					on:click={() => {
+						console.log('Y軸 ボタンクリック');
+						highlightedAxis = 'y';
+					}}
 				>
 					Y軸（上下）
 				</button>
 				<button 
 					class="axis-btn axis-btn--z {highlightedAxis === 'z' ? 'active' : ''}"
-					on:click={() => highlightedAxis = 'z'}
+					on:click={() => {
+						console.log('Z軸 ボタンクリック');
+						highlightedAxis = 'z';
+					}}
 				>
 					Z軸（前後）
 				</button>
@@ -836,9 +875,11 @@
 	}
 
 	.axis-btn.active {
-		background: rgba(255, 255, 255, 0.3);
-		border-color: rgba(255, 255, 255, 0.6);
-		font-weight: 600;
+		background: rgba(255, 255, 255, 0.4);
+		border-color: rgba(255, 255, 255, 0.8);
+		font-weight: 700;
+		box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+		transform: scale(1.05);
 	}
 
 	.axis-btn--x.active {
