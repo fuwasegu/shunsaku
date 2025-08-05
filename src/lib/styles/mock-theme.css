@@ -116,6 +116,19 @@
   transform: none;
 }
 
+.mock-btn--youtube {
+  background-color: #ff0000; /* YouTube red */
+  color: white;
+  border: 1px solid #ff0000;
+}
+
+.mock-btn--youtube:hover {
+  background-color: #cc0000; /* Darker YouTube red */
+  border-color: #cc0000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2);
+}
+
 /* プログレスバー */
 .mock-progress {
   width: 100%;

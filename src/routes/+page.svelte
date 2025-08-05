@@ -149,6 +149,12 @@
 		}
 	}
 
+	// YouTube検索URL生成
+	function generateYouTubeSearchUrl(productName: string): string {
+		const searchQuery = `${productName} レビュー 試打`;
+		return `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+	}
+
 	async function startMeasurement() {
 		try {
 			// センサーサポート確認
@@ -519,12 +525,18 @@
 							
 							<p class="mock-text-sm mock-text-gray-700 mock-mb-3">{combo.reason}</p>
 							
-							<div class="mock-flex mock-gap-2">
-								              <a href={combo.head.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
-                ヘッド 商品ページ
-              </a>
-              <a href={combo.shaft.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
-                シャフト 商品ページ
+							<div class="mock-flex mock-gap-2 mock-flex-wrap">
+								<a href={combo.head.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
+									🛒 ヘッド 商品ページ
+								</a>
+								<a href={combo.shaft.amazonUrl} target="_blank" class="mock-btn mock-btn--outline mock-text-xs">
+									🛒 シャフト 商品ページ
+								</a>
+								<a href={generateYouTubeSearchUrl(combo.head.name)} target="_blank" class="mock-btn mock-btn--outline mock-text-xs mock-btn--youtube">
+									📺 ヘッドレビュー動画
+								</a>
+								<a href={generateYouTubeSearchUrl(combo.shaft.name)} target="_blank" class="mock-btn mock-btn--outline mock-text-xs mock-btn--youtube">
+									📺 シャフトレビュー動画
 								</a>
 							</div>
 						</div>
